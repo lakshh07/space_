@@ -9,11 +9,22 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@biconomy/account": "^3.1.0",
+    "@biconomy/bundler": "^3.1.0",
+    "@biconomy/common": "^3.1.0",
+    "@biconomy/core-types": "^3.1.0",
+    "@biconomy/particle-auth": "^3.1.0",
+    "@biconomy/paymaster": "^3.1.0",
     "@chakra-ui/next-js": "^2.1.5",
     "@chakra-ui/react": "^2.8.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@particle-network/auth": "^1.2.1",
+    "@particle-network/chains": "^1.2.1",
+    "@particle-network/provider": "^1.2.0",
+    "@particle-network/rainbowkit-ext": "^1.2.0",
     "@rainbow-me/rainbowkit": "^1.0.12",
+    "ethers": "5.7.2",
     "framer-motion": "^10.16.4",
     "next": "13.5.4",
     "react": "^18",
@@ -21,6 +32,7 @@
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.11.0",
     "react-spinners": "^0.13.8",
+    "truncate-middle": "^1.0.6",
     "viem": "^1.15.3",
     "wagmi": "^1.4.3"
   },
@@ -28,6 +40,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/truncate-middle": "^1.0.2",
     "eslint": "^8",
     "eslint-config-next": "13.5.4",
     "typescript": "^5"

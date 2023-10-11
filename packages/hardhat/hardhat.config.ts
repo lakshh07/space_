@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.21",
+    version: "0.8.20",
     settings: {
       optimizer: {
         enabled: true,
@@ -12,19 +12,19 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  defaultNetwork: "mumbai",
+  // defaultNetwork: "mumbai",
   networks: {
     hardhat: {
       chainId: 1337,
     },
-    mumbai: {
-      url: `${process.env.MUMBAI_ALCHEMY_KEY}`,
-      accounts: [`0x${process.env.PK}`],
-    },
-    polygon: {
-      url: `${process.env.POLYGON_ALCHEMY_KEY}`,
-      accounts: [`0x${process.env.PK}`],
-    },
+    // mumbai: {
+    //   url: `${process.env.MUMBAI_ALCHEMY_KEY}`,
+    //   accounts: [`0x${process.env.PK}`],
+    // },
+    // polygon: {
+    //   url: `${process.env.POLYGON_ALCHEMY_KEY}`,
+    //   accounts: [`0x${process.env.PK}`],
+    // },
   },
 };
 
