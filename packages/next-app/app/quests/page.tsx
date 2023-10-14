@@ -1,6 +1,6 @@
 import React from "react";
-import { DashboardClient } from "./DashboardClient";
+import { QuestClient } from "./QuestClient";
 
 export default function DashboardPage() {
-  return <DashboardClient />;
+  return <QuestClient />;
 }

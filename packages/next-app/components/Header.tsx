@@ -1,17 +1,32 @@
-import { Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { Button, Flex, Heading, Text, useDisclosure } from "@chakra-ui/react";
 import React from "react";
+import { CreateModal, fieldDataType } from "./CreateModal";
 
 interface HeaderProps {
   title: string;
   length: number;
   actionLabel: string;
+  formData: fieldDataType;
+  setFormData: React.Dispatch<React.SetStateAction<fieldDataType>>;
+  isCampaign: boolean;
+  isLoading: boolean;
+  isDisabled: boolean;
+  onSubmit: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   title,
   length,
   actionLabel,
+  formData,
+  setFormData,
+  isCampaign,
+  isLoading,
+  isDisabled,
+  onSubmit,
 }) => {
+  const { isOpen, onClose, onOpen } = useDisclosure();
+
   return (
     <Flex alignItems={"center"} justifyContent={"space-between"} mb={"2.5em"}>
       <Flex alignItems={"center"}>
@@ -36,17 +51,21 @@ export const Header: React.FC<HeaderProps> = ({
         </Text>
       </Flex>
 
-      <Button
-        borderWidth={"2px"}
-        borderColor={"rgb(10 10 10/1)"}
-        borderRadius={"0.625rem"}
-        bg={"rgb(10 10 10/1)"}
-        py={"0.375rem"}
-        px={"1rem"}
-        colorScheme={"black"}
-      >
+      <Button borderRadius={"15px"} colorScheme={"purple"} onClick={onOpen}>
         {actionLabel}
       </Button>
+
+      <CreateModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={actionLabel}
+        formData={formData}
+        setFormData={setFormData}
+        isCampaign={isCampaign}
+        onSubmit={onSubmit}
+        isLoading={isLoading}
+        isDisabled={isDisabled}
+      />
     </Flex>
   );
 };

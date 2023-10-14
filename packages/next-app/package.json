@@ -35,8 +35,10 @@
     "react-spinners": "^0.13.8",
     "socket.io-client": "^4.7.2",
     "truncate-middle": "^1.0.6",
+    "uuid": "^9.0.1",
     "viem": "^1.15.3",
-    "wagmi": "^1.4.3"
+    "wagmi": "^1.4.3",
+    "web3.storage": "^4.5.5"
   },
   "devDependencies": {
     "@types/node": "^20",

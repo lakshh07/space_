@@ -28,10 +28,9 @@ export const Navbar: React.FC = () => {
   const { setSmartAccount } = useSmartAccountContext();
 
   const createSmartAccount = async () => {
+    const toastId = toast.loading("Creating Smart Account...");
+
     try {
-      toast.loading("Creating Smart Account...", {
-        duration: 2500,
-      });
       const ethersSigner = ethersProvider.getSigner();
       const module = await ECDSAOwnershipValidationModule.create({
         signer: ethersSigner,
@@ -48,9 +47,11 @@ export const Navbar: React.FC = () => {
       const smartAccountAddress =
         await biconomySmartAccount.getAccountAddress();
       setSmartAccount(biconomySmartAccount);
-      toast.success("Smart Account successfully created!");
+      toast.success("Smart Account successfully created!", {
+        id: toastId,
+      });
     } catch (error: any) {
-      toast.error("Something went wrong with Smart Account.");
+      toast.error("Something went wrong with Smart Account.", { id: toastId });
     }
   };
 
