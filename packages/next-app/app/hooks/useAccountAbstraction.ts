@@ -36,12 +36,6 @@ const useAccountAbstraction = async ({
     setDisabled(true);
 
     const minTx = transactionData;
-    // const minTx = await contract.populateTransaction.createQuest(
-    //   "id2",
-    //   "metadata2",
-    //   1,
-    //   15
-    // );
 
     console.log(minTx.data);
     const tx1 = {

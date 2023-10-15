@@ -4,7 +4,7 @@ import { Card } from "@/components/Card";
 import { fieldDataType } from "@/components/CreateModal";
 import { Header } from "@/components/Header";
 import { Container } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import useAccountAbstraction, {
   contract,
@@ -14,6 +14,16 @@ import { useAccount } from "wagmi";
 import makeStorageClient from "../hooks/useWeb3StorageClient";
 import toast from "react-hot-toast";
 import { ethers } from "ethers";
+
+export type questDataType = {
+  id: string;
+  creator: string;
+  metadata: string;
+  amount: number;
+  status: boolean;
+  xp: number;
+  assigned: string;
+};
 
 export const QuestClient = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -30,6 +40,30 @@ export const QuestClient = () => {
   const { address } = useAccount();
   // https://bafybeicz6whpwp2yd2tdu3e5vvu2k5ljujdlwuhxl5dowil4tooiwme4ba.ipfs.w3s.link/space_questData.json
 
+  const sampleData = [
+    {
+      id: "dchbuwd6cgwyidgc8w",
+      creator: "0xc632F549D5107C32B9FF47937DAB11008b1e2636",
+      metadata: "bafybeich5ihaju3d7ojqnaxknwxg4vsdb4ccewfd435ebmd72kcegb3nrm",
+      amount: 2000000000000000,
+      status: false,
+      xp: 10,
+      interestedUser:
+        "0x1632F549D5107C32B9FF47937DAB11008b1e2636,0x987F549D5107C32B9FF47937DAB11008b1e2636,0x6532F549D5107C32B9FF47937DAB11008b1e2636",
+      assigned: "",
+    },
+    {
+      id: "dchbuwd6cgwyidgc8w",
+      creator: "0xc632F549D5107C32B9FF47937DAB11008b1e2636",
+      metadata: "bafybeiapcbhqiglgyt2rk6il5n5tztrf7mofni43dqhil6g77wqtwmjh6e",
+      amount: 2000000000000000,
+      status: false,
+      xp: 10,
+      interestedUser: "0x1632F549D5107C32B9FF47937DAB11008b1e2636",
+      assigned: "0x3632F549D5107C32B9FF47937DAB11008b1e2636",
+    },
+  ];
+
   const create = async () => {
     setLoading(true);
     setDisabled(true);
@@ -39,11 +73,12 @@ export const QuestClient = () => {
     const newAmount = ethers.utils.parseEther(questData.amount.toString());
     let fileBlob = new File(
       [`${JSON.stringify({ ...questData, amount: newAmount.toString() })}`],
-      `space_questData.json`,
+      `space_data.json`,
       { type: "application/json" }
     );
 
     const cid = await client.put([fileBlob]);
+    console.log(cid, "IPFS CID");
 
     toast.success("Files uploaded to IPFS.", {
       id: tokenId,
@@ -53,7 +88,7 @@ export const QuestClient = () => {
       uuidv4(),
       cid.toString(),
       address,
-      questData.amount,
+      parseFloat(newAmount.toString()),
       questData.xp
     );
 
@@ -64,27 +99,6 @@ export const QuestClient = () => {
       smartAccount: smartAccount,
     });
   };
-
-  const lists = [
-    {
-      title: "HackOnline Hackathon",
-      description:
-        " Invite to join the hackthon with full team and power to win this hackthon and blah blah blah",
-      duration: "2 week",
-      amount: 1.2,
-      points: 10,
-      status: 1,
-    },
-    {
-      title: "HackOnline Hackathon",
-      description:
-        " Invite to join the hackthon with full team and power to win this hackthon and blah blah blah",
-      duration: "1 week",
-      amount: 0.2,
-      points: 20,
-      status: 0,
-    },
-  ];
 
   return (
     <Container my={"4rem"} maxW={"1200px"}>
@@ -100,16 +114,17 @@ export const QuestClient = () => {
         setFormData={setQuestData}
       />
 
-      {lists.map((list, index) => {
+      {sampleData.map((list, index) => {
         return (
           <Card
             key={index}
-            title={list.title}
-            description={list.description}
-            duration={list.duration}
+            id={index}
+            creator={list.creator}
             amount={list.amount}
-            points={list.points}
             status={list.status}
+            interestedUser={list.interestedUser}
+            assignedUser={list.assigned}
+            metadata={list.metadata}
           />
         );
       })}
