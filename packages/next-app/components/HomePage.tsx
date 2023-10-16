@@ -2,14 +2,20 @@
 
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { Dela_Gothic_One } from "next/font/google";
 import { useRouter } from "next/navigation";
+import { useLoadingContext } from "@/context/loading";
 
 const delaGothicOne = Dela_Gothic_One({ weight: "400", subsets: ["latin"] });
 
 export const HomePage: React.FC = () => {
   const router = useRouter();
+  const { setMainLoading } = useLoadingContext();
+
+  useEffect(() => {
+    setMainLoading(false);
+  }, []);
 
   return (
     <Box h={"calc(100vh - 150px)"}>
@@ -56,7 +62,10 @@ export const HomePage: React.FC = () => {
                 bg: "#7263D6",
                 transform: "scale(1.025)",
               }}
-              onClick={() => router.push("/quests")}
+              onClick={() => {
+                setMainLoading(true);
+                router.push("/quests");
+              }}
             >
               Get Started
             </Button>

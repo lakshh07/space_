@@ -18,15 +18,21 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { VscUnverified, VscVerifiedFilled } from "react-icons/vsc";
 import { FcGoogle } from "react-icons/fc";
 import truncateMiddle from "truncate-middle";
 import { QRCodeModal } from "@/components/QRCodeModal";
+import { useLoadingContext } from "@/context/loading";
 
-export const ProfileClient = () => {
+export const ProfileClient: React.FC = () => {
   const [verified, setVerified] = useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { setMainLoading } = useLoadingContext();
+
+  useEffect(() => {
+    setMainLoading(false);
+  }, []);
 
   return (
     <Box>

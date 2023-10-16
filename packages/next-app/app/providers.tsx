@@ -12,7 +12,7 @@ import { useState } from "react";
 import { WagmiConfig } from "wagmi";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [mainLoading, setMainLoading] = useState<boolean>(false);
+  const [mainLoading, setMainLoading] = useState<boolean>(true);
   const [smartAccount, setSmartAccount] = useState<BiconomySmartAccountV2>();
 
   return (

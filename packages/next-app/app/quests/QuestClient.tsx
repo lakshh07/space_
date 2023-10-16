@@ -11,9 +11,10 @@ import useAccountAbstraction, {
 } from "../hooks/useAccountAbstraction";
 import { useSmartAccountContext } from "@/context/userAccount";
 import { useAccount } from "wagmi";
-import makeStorageClient from "../hooks/useWeb3StorageClient";
+import { addToIPFS } from "../hooks/useWeb3StorageClient";
 import toast from "react-hot-toast";
 import { ethers } from "ethers";
+import { useLoadingContext } from "@/context/loading";
 
 export type questDataType = {
   id: string;
@@ -25,7 +26,7 @@ export type questDataType = {
   assigned: string;
 };
 
-export const QuestClient = () => {
+export const QuestClient: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [questData, setQuestData] = useState<fieldDataType>({
@@ -38,6 +39,7 @@ export const QuestClient = () => {
   });
   const { smartAccount } = useSmartAccountContext();
   const { address } = useAccount();
+  const { setMainLoading } = useLoadingContext();
   // https://bafybeicz6whpwp2yd2tdu3e5vvu2k5ljujdlwuhxl5dowil4tooiwme4ba.ipfs.w3s.link/space_questData.json
 
   const sampleData = [
@@ -64,20 +66,21 @@ export const QuestClient = () => {
     },
   ];
 
+  useEffect(() => {
+    setMainLoading(false);
+  }, [sampleData]);
+
   const create = async () => {
     setLoading(true);
     setDisabled(true);
     const tokenId = toast.loading("Saving file to ipfs...");
-    const client = makeStorageClient();
 
     const newAmount = ethers.utils.parseEther(questData.amount.toString());
-    let fileBlob = new File(
-      [`${JSON.stringify({ ...questData, amount: newAmount.toString() })}`],
-      `space_data.json`,
-      { type: "application/json" }
-    );
-
-    const cid = await client.put([fileBlob]);
+    const cid = await addToIPFS({
+      ...questData,
+      // @ts-ignore
+      amount: newAmount.toString(),
+    });
     console.log(cid, "IPFS CID");
 
     toast.success("Files uploaded to IPFS.", {
@@ -118,7 +121,7 @@ export const QuestClient = () => {
         return (
           <Card
             key={index}
-            id={index}
+            index={index}
             creator={list.creator}
             amount={list.amount}
             status={list.status}

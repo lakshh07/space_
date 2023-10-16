@@ -18,3 +18,11 @@ body,
 [data-rk] .ju367v2b {
   height: auto !important;
 }
+
+/* date picker */
+.rdrMonth {
+  width: 100% !important;
+}
+.rdrCalendarWrapper {
+  width: 100% !important;
+}

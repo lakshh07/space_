@@ -25,6 +25,8 @@ import {
 } from "@chakra-ui/react";
 import Image from "next/image";
 import React from "react";
+import { Range } from "react-date-range";
+import DatePicker from "./DataPicker";
 
 export type fieldDataType = {
   title: string;
@@ -33,6 +35,8 @@ export type fieldDataType = {
   details?: string;
   amount: number;
   xp: number;
+  startDate?: string;
+  endDate?: string;
 };
 
 interface NewQuestModalProps {
@@ -45,6 +49,8 @@ interface NewQuestModalProps {
   isCampaign: boolean;
   isLoading: boolean;
   isDisabled: boolean;
+  dateRange?: Range;
+  onChangeDate?: (value: Range) => void;
 }
 
 export const CreateModal: React.FC<NewQuestModalProps> = ({
@@ -57,6 +63,8 @@ export const CreateModal: React.FC<NewQuestModalProps> = ({
   isLoading,
   formData,
   setFormData,
+  dateRange,
+  onChangeDate,
 }) => {
   function onChange(e: any) {
     setFormData(() => ({ ...formData, [e.target.name]: e.target.value }));
@@ -95,57 +103,74 @@ export const CreateModal: React.FC<NewQuestModalProps> = ({
 
             <FormControl mt={"1em"} isRequired>
               <FormLabel>Description</FormLabel>
-              <Input
-                name="description"
-                value={formData.description}
-                onChange={onChange}
-                _focus={{
-                  borderColor: "purple",
-                }}
-              />
+
+              {isCampaign ? (
+                <Textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={onChange}
+                  placeholder={
+                    "how your campaign will function or how the funds raised will be utilized"
+                  }
+                  _focus={{
+                    borderColor: "purple",
+                  }}
+                />
+              ) : (
+                <Input
+                  name="description"
+                  value={formData.description}
+                  onChange={onChange}
+                  _focus={{
+                    borderColor: "purple",
+                  }}
+                />
+              )}
             </FormControl>
 
-            <FormControl mt={"1em"} isRequired={!isCampaign}>
-              <Flex alignItems={"baseline"}>
+            {!isCampaign && (
+              <FormControl mt={"1em"}>
                 <FormLabel>Details</FormLabel>
-                {isCampaign && (
-                  <Text fontSize={"12px"} color={"gray"} ml={"-0.5em"}>
-                    (optional)
-                  </Text>
-                )}
-              </Flex>
+                <Textarea
+                  name="details"
+                  value={formData.details}
+                  onChange={onChange}
+                  placeholder={
+                    "What do you need and how do you want it to be done?"
+                  }
+                  _focus={{
+                    borderColor: "purple",
+                  }}
+                />
+              </FormControl>
+            )}
 
-              <Textarea
-                name="details"
-                value={formData.details}
-                onChange={onChange}
-                placeholder={
-                  isCampaign
-                    ? "how your campaign will function or how the funds raised will be utilized"
-                    : "What do you need and how do you want it to be done?"
-                }
-                _focus={{
-                  borderColor: "purple",
-                }}
-              />
-            </FormControl>
-
-            <FormControl mt={"1em"} isRequired>
-              <FormLabel>Duration</FormLabel>
-              <Input
-                name="duration"
-                value={formData.duration}
-                onChange={onChange}
-                placeholder={"10 days or 1 week"}
-                _focus={{
-                  borderColor: "purple",
-                }}
-              />
-            </FormControl>
+            {isCampaign && dateRange && onChangeDate ? (
+              <FormControl mt={"1em"} isRequired w={"100%"}>
+                <FormLabel>Select Date</FormLabel>
+                <DatePicker
+                  value={dateRange}
+                  onChange={(value) => onChangeDate(value.selection)}
+                />
+              </FormControl>
+            ) : (
+              <FormControl mt={"1em"} isRequired>
+                <FormLabel>Duration</FormLabel>
+                <Input
+                  name="duration"
+                  value={formData.duration}
+                  onChange={onChange}
+                  placeholder={"10 days or 1 week"}
+                  _focus={{
+                    borderColor: "purple",
+                  }}
+                />
+              </FormControl>
+            )}
 
             <Flex alignItems={"center"} gap={"2rem"}>
               <FormControl mt={"1em"} isRequired>
-                <FormLabel>Amount</FormLabel>
+                <FormLabel>{isCampaign ? "Goal" : "Amount"}</FormLabel>
                 <InputGroup
                   _focus={{
                     borderColor: "purple",
@@ -163,13 +188,18 @@ export const CreateModal: React.FC<NewQuestModalProps> = ({
                       src={"/assets/polygon-matic-logo.svg"}
                     />
                   </InputLeftElement>
-                  <NumberInput w={"100%"} step={0.1} min={0} defaultValue={0.0}>
-                    <NumberInputField
-                      pl={"2.5em"}
-                      name="amount"
-                      value={formData.amount}
-                      onChange={onChange}
-                    />
+                  <NumberInput
+                    w={"100%"}
+                    step={0.1}
+                    min={0}
+                    defaultValue={0.0}
+                    name="amount"
+                    value={formData.amount}
+                    onChange={(value) =>
+                      onChange({ target: { name: "amount", value } })
+                    }
+                  >
+                    <NumberInputField pl={"2.5em"} />
                     <NumberInputStepper>
                       <NumberIncrementStepper />
                       <NumberDecrementStepper />
@@ -185,12 +215,16 @@ export const CreateModal: React.FC<NewQuestModalProps> = ({
                     borderColor: "purple",
                   }}
                 >
-                  <NumberInput w={"100%"} min={0} defaultValue={0}>
-                    <NumberInputField
-                      name="xp"
-                      value={formData.xp}
-                      onChange={onChange}
-                    />
+                  <NumberInput
+                    w={"100%"}
+                    min={0}
+                    defaultValue={0}
+                    value={formData.xp}
+                    onChange={(value) =>
+                      onChange({ target: { name: "xp", value } })
+                    }
+                  >
+                    <NumberInputField />
                     <NumberInputStepper>
                       <NumberIncrementStepper />
                       <NumberDecrementStepper />

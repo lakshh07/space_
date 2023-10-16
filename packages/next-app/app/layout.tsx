@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/Navbar";
+import { Loading } from "@/components/Loading";
 
 const openSans = Open_Sans({
   weight: ["400", "500", "600", "700", "800"],
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={openSans.className}>
         <Providers>
+          <Loading />
           <Navbar />
           {children}
         </Providers>

@@ -75,10 +75,7 @@ contract Space_ is Ownable, ReentrancyGuard {
         bool status;
         uint256 xp;
         address assigned;
-    }
-
-    struct Assigner {
-        string assigner;
+        string interestedUsers;
     }
 
     struct Donor {
@@ -97,7 +94,8 @@ contract Space_ is Ownable, ReentrancyGuard {
         uint256 amount,
         bool status,
         uint256 xp,
-        address assigned
+        address assigned,
+        string interestedUsers
     );
 
     event CampaignCreated(
@@ -113,18 +111,19 @@ contract Space_ is Ownable, ReentrancyGuard {
 
     event CampaignStatusChanged(uint256 id, bool status);
 
-    event QuestStatusChanged(string id, bool status);
+    event AssignersAdded(uint256 id, address assignerList);
 
-    event AssignersAdded(uint256 id, string assignerList);
-
-    event AssignerAdded(uint256 id, address assignerAddress);
+    event QuestUserAdded(
+        uint256 questId,
+        address interestedUserAddress,
+        string userComment
+    );
 
     event QuestCompleted(
         uint256 id,
         address assignerAddress,
         bool questStatus,
-        uint256 creatorXP,
-        address creatorAddress
+        uint256 creatorXP
     );
 
     event DonateToCampaign(
@@ -139,11 +138,12 @@ contract Space_ is Ownable, ReentrancyGuard {
     mapping(uint256 => Quest) idToQuest;
     mapping(uint256 => Campaign) idToCampaign;
     mapping(uint256 => mapping(uint256 => Donor)) idToDonor;
-    mapping(uint256 => Assigner) assigners;
+    mapping(uint256 => mapping(address => string)) interstedUserComments;
 
     function createQuest(
         string memory _id,
         string memory _metadata,
+        address _creator,
         uint256 _amount,
         uint256 _xp
     ) external nonReentrant {
@@ -157,71 +157,82 @@ contract Space_ is Ownable, ReentrancyGuard {
 
         idToQuest[questCount] = Quest(
             _id,
-            msg.sender,
+            _creator,
             _metadata,
             _amount,
             false,
             _xp,
-            address(0)
+            address(0),
+            ""
         );
 
         emit QuestCreated(
             _id,
-            msg.sender,
+            _creator,
             _metadata,
             _amount,
             false,
             _xp,
-            address(0)
+            address(0),
+            ""
         );
     }
 
-    function approveQuestByInfluencer(
-        uint256 _id,
-        string memory _assignersList
+    function addQuestUser(
+        uint256 _questId,
+        string memory _interestedUserAddresses,
+        address _interestedUserAddress,
+        string memory _userComment
     ) external nonReentrant {
-        assigners[_id] = Assigner(_assignersList);
+        idToQuest[_questId].interestedUsers = _interestedUserAddresses;
+        interstedUserComments[_questId][_interestedUserAddress] = _userComment;
 
-        emit AssignersAdded(_id, _assignersList);
+        emit QuestUserAdded(_questId, _interestedUserAddress, _userComment);
     }
 
-    function questAssigned(
-        uint256 _id,
-        address _assignerAddress
-    ) external nonReentrant {
-        idToQuest[_id].assigned = _assignerAddress;
-
-        emit AssignerAdded(_id, _assignerAddress);
+    function fetchInterestedUserComment(
+        uint256 _questId,
+        address _interestedUserAddress
+    ) external view returns (string memory) {
+        return interstedUserComments[_questId][_interestedUserAddress];
     }
 
-    function questComplete(
+    function approveQuestInterestedUser(
         uint256 _id,
-        address payable _assignerAddress
-    ) external payable nonReentrant {
+        address _interestedUser
+    ) external nonReentrant {
+        idToQuest[_id].assigned = _interestedUser;
+
+        emit AssignersAdded(_id, _interestedUser);
+    }
+
+    function questComplete(uint256 _id) external payable nonReentrant {
         require(
             msg.value == idToQuest[_id].amount,
             "Amount should be same as mentioned in quest"
         );
 
-        idToQuest[_id].status = true;
-        addressToCreator[_assignerAddress].totalXP = idToQuest[_id].xp;
-        addressToCreator[_assignerAddress].creator = _assignerAddress;
+        address assignedUser = idToQuest[_id].assigned;
 
-        (bool sent, ) = _assignerAddress.call{value: msg.value}("");
-        require(sent, "Failed to transfer amoun to assigned creator");
+        (bool sent, ) = assignedUser.call{value: msg.value}("");
+        require(sent, "Failed to transfer amoun to assigned user");
+
+        idToQuest[_id].status = true;
+        addressToCreator[assignedUser].creator = assignedUser;
+        addressToCreator[assignedUser].totalXP += idToQuest[_id].xp;
 
         emit QuestCompleted(
             _id,
-            _assignerAddress,
+            assignedUser,
             true,
-            idToQuest[_id].xp,
-            _assignerAddress
+            addressToCreator[assignedUser].totalXP
         );
     }
 
     function createCampaign(
         string memory _id,
-        string memory _metadata,
+        string memory _metadata, //title, description, duration
+        address _creator,
         uint256 _totalAmount,
         uint256 _xp
     ) external nonReentrant {
@@ -235,7 +246,7 @@ contract Space_ is Ownable, ReentrancyGuard {
 
         idToCampaign[campaignCount] = Campaign(
             _id,
-            msg.sender,
+            _creator,
             _metadata,
             _totalAmount,
             0,
@@ -246,7 +257,7 @@ contract Space_ is Ownable, ReentrancyGuard {
 
         emit CampaignCreated(
             _id,
-            msg.sender,
+            _creator,
             _metadata,
             _totalAmount,
             0,

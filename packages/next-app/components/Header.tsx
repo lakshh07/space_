@@ -1,6 +1,7 @@
 import { Button, Flex, Heading, Text, useDisclosure } from "@chakra-ui/react";
 import React from "react";
 import { CreateModal, fieldDataType } from "./CreateModal";
+import { Range } from "react-date-range";
 
 interface HeaderProps {
   title: string;
@@ -12,6 +13,8 @@ interface HeaderProps {
   isLoading: boolean;
   isDisabled: boolean;
   onSubmit: () => void;
+  dateRange?: Range;
+  onChangeDate?: (value: Range) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -24,6 +27,8 @@ export const Header: React.FC<HeaderProps> = ({
   isLoading,
   isDisabled,
   onSubmit,
+  dateRange,
+  onChangeDate,
 }) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -65,6 +70,8 @@ export const Header: React.FC<HeaderProps> = ({
         onSubmit={onSubmit}
         isLoading={isLoading}
         isDisabled={isDisabled}
+        dateRange={dateRange}
+        onChangeDate={onChangeDate}
       />
     </Flex>
   );

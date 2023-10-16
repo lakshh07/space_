@@ -16,7 +16,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
-import { questMetadataType } from "../Card";
+import { MetadataType } from "../Card";
 import { ethers } from "ethers";
 import useAccountAbstraction, {
   contract,
@@ -29,9 +29,9 @@ interface QuestModalProps {
   id: number;
   creator: string;
   status: boolean;
-  assignedUser: string;
-  metadata: questMetadataType | undefined;
-  interestedUserArray: string[];
+  assignedUser?: string;
+  metadata: MetadataType | undefined;
+  interestedUserArray?: string[];
   isOpen: boolean;
   onClose: () => void;
 }
@@ -60,7 +60,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
   const { address } = useAccount();
 
   const createComment = async () => {
-    if (address) {
+    if (address && interestedUserArray) {
       interestedUserArray.push(address);
       const interestedUserArrayString = interestedUserArray.toString();
 
@@ -207,7 +207,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
               <Text mt={"1em"} fontWeight={600} fontSize={"17px"}>
                 Interested Users:
               </Text>
-              {interestedUserArray.map((userAddress, index) => {
+              {interestedUserArray?.map((userAddress, index) => {
                 return (
                   <Flex
                     mb={"1em"}

@@ -17,6 +17,7 @@ import {
 import { useSmartAccountContext } from "@/context/userAccount";
 import { ethersProvider } from "@/utils/rainbowConfig";
 import toast from "react-hot-toast";
+import { useLoadingContext } from "@/context/loading";
 
 export const Navbar: React.FC = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ export const Navbar: React.FC = () => {
   const links = ["quests", "campaigns", "profile"];
   const { paymaster, bundler, ChainId } = useAAHooks();
   const { setSmartAccount } = useSmartAccountContext();
+  const { setMainLoading } = useLoadingContext();
 
   const createSmartAccount = async () => {
     const toastId = toast.loading("Creating Smart Account...");
@@ -75,7 +77,10 @@ export const Navbar: React.FC = () => {
           fontSize={"2em"}
           fontWeight={800}
           cursor={"pointer"}
-          onClick={() => router.push("/")}
+          onClick={() => {
+            setMainLoading(true);
+            router.push("/");
+          }}
         >
           Space<span style={{ color: "#FF6F03" }}>_</span>
         </Heading>
@@ -103,7 +108,10 @@ export const Navbar: React.FC = () => {
                     transition: "color 0.2s ease",
                   }}
                   fontWeight={pathname === `/${link}` ? 600 : 500}
-                  onClick={() => router.push(`/${link}`)}
+                  onClick={() => {
+                    setMainLoading(true);
+                    router.push(`/${link}`);
+                  }}
                 >
                   {link}
                 </Text>
