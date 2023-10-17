@@ -14,10 +14,10 @@ import {
 import React, { useEffect, useState } from "react";
 import { Gabarito } from "next/font/google";
 import Image from "next/image";
-import { contract } from "@/app/hooks/useAccountAbstraction";
+import { contract } from "@/hooks/useAccountAbstraction";
 import toast from "react-hot-toast";
 import { useWaitForTransaction } from "wagmi";
-import { fetchIpfsCid } from "@/app/hooks/useWeb3StorageClient";
+import { fetchIpfsCid } from "@/hooks/useWeb3StorageClient";
 import { MetadataType } from "@/components/Card";
 import { ethers } from "ethers";
 import moment from "moment";

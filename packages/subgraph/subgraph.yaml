@@ -1,0 +1,57 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Space_
+    network: mumbai
+    source:
+      address: "0x4e66a787081c05D670def58b358B3D46E2cDb95D"
+      abi: Space_
+      startBlock: 41300415
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AssignersAdded
+        - CampaignCreated
+        - CampaignDeleted
+        - CampaignStatusChanged
+        - CreatorMetadataChanged
+        - CreatorVerified
+        - DonateToCampaign
+        - OwnershipTransferred
+        - QuestCompleted
+        - QuestCreated
+        - QuestDeleted
+        - QuestUserAdded
+      abis:
+        - name: Space_
+          file: ./abis/Space_.json
+      eventHandlers:
+        - event: AssignersAdded(uint256,address)
+          handler: handleAssignersAdded
+        - event: CampaignCreated(string,address,string,uint256,uint256,uint256,bool,uint256)
+          handler: handleCampaignCreated
+        - event: CampaignDeleted(uint256)
+          handler: handleCampaignDeleted
+        - event: CampaignStatusChanged(uint256,bool)
+          handler: handleCampaignStatusChanged
+        - event: CreatorMetadataChanged(address,string)
+          handler: handleCreatorMetadataChanged
+        - event: CreatorVerified(address,bool)
+          handler: handleCreatorVerified
+        - event: DonateToCampaign(uint256,uint256,address,uint256,uint256)
+          handler: handleDonateToCampaign
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: QuestCompleted(uint256,address,bool,uint256)
+          handler: handleQuestCompleted
+        - event: QuestCreated(string,address,string,uint256,bool,uint256,address,string)
+          handler: handleQuestCreated
+        - event: QuestDeleted(uint256)
+          handler: handleQuestDeleted
+        - event: QuestUserAdded(uint256,address,string)
+          handler: handleQuestUserAdded
+      file: ./src/space.ts

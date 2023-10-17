@@ -6,12 +6,10 @@ import { Header } from "@/components/Header";
 import { Container } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import useAccountAbstraction, {
-  contract,
-} from "../hooks/useAccountAbstraction";
+import useAccountAbstraction, { contract } from "@/hooks/useAccountAbstraction";
 import { useSmartAccountContext } from "@/context/userAccount";
 import { useAccount } from "wagmi";
-import { addToIPFS } from "../hooks/useWeb3StorageClient";
+import { addToIPFS } from "@/hooks/useWeb3StorageClient";
 import toast from "react-hot-toast";
 import { ethers } from "ethers";
 import { useLoadingContext } from "@/context/loading";
@@ -46,7 +44,7 @@ export const QuestClient: React.FC = () => {
     {
       id: "dchbuwd6cgwyidgc8w",
       creator: "0xc632F549D5107C32B9FF47937DAB11008b1e2636",
-      metadata: "bafybeich5ihaju3d7ojqnaxknwxg4vsdb4ccewfd435ebmd72kcegb3nrm",
+      metadata: "bafybeieh5dr4korj32zbv3faitmyp4eucmq2snw5yasns5ujulro5yioei",
       amount: 2000000000000000,
       status: false,
       xp: 10,
@@ -91,7 +89,7 @@ export const QuestClient: React.FC = () => {
       uuidv4(),
       cid.toString(),
       address,
-      parseFloat(newAmount.toString()),
+      newAmount.toString(),
       questData.xp
     );
 
@@ -100,6 +98,15 @@ export const QuestClient: React.FC = () => {
       setLoading: setLoading,
       transactionData: transaction,
       smartAccount: smartAccount,
+    });
+
+    setQuestData({
+      title: "",
+      description: "",
+      duration: "",
+      details: "",
+      amount: 0,
+      xp: 0,
     });
   };
 

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useWalletClient, usePublicClient } from "wagmi";
-import useAAHooks from "@/app/hooks/useAAHooks";
+import useAAHooks from "@/hooks/useAAHooks";
 import {
   ECDSAOwnershipValidationModule,
   DEFAULT_ECDSA_OWNERSHIP_MODULE,

@@ -1,0 +1,123 @@
+type AssignersAdded @entity(immutable: true) {
+  id: Bytes!
+  Space__id: BigInt! # uint256
+  assignerList: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type CampaignCreated @entity(immutable: true) {
+  id: Bytes!
+  Space__id: String! # string
+  creator: Bytes! # address
+  metadata: String! # string
+  totalAmount: BigInt! # uint256
+  donatedAmount: BigInt! # uint256
+  totalDonors: BigInt! # uint256
+  status: Boolean! # bool
+  xp: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type CampaignDeleted @entity(immutable: true) {
+  id: Bytes!
+  Space__id: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type CampaignStatusChanged @entity(immutable: true) {
+  id: Bytes!
+  Space__id: BigInt! # uint256
+  status: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type CreatorMetadataChanged @entity(immutable: true) {
+  id: Bytes!
+  creator: Bytes! # address
+  metadata: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type CreatorVerified @entity(immutable: true) {
+  id: Bytes!
+  creator: Bytes! # address
+  isVerified: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type DonateToCampaign @entity(immutable: true) {
+  id: Bytes!
+  Space__id: BigInt! # uint256
+  totalDonatedAmount: BigInt! # uint256
+  donorAddress: Bytes! # address
+  donorAmount: BigInt! # uint256
+  totalDonors: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestCompleted @entity(immutable: true) {
+  id: Bytes!
+  Space__id: BigInt! # uint256
+  assignerAddress: Bytes! # address
+  questStatus: Boolean! # bool
+  creatorXP: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestCreated @entity(immutable: true) {
+  id: Bytes!
+  Space__id: String! # string
+  creator: Bytes! # address
+  metadata: String! # string
+  amount: BigInt! # uint256
+  status: Boolean! # bool
+  xp: BigInt! # uint256
+  assigned: Bytes! # address
+  interestedUsers: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestDeleted @entity(immutable: true) {
+  id: Bytes!
+  Space__id: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestUserAdded @entity(immutable: true) {
+  id: Bytes!
+  questId: BigInt! # uint256
+  interestedUserAddress: Bytes! # address
+  userComment: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

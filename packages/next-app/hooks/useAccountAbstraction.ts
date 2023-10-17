@@ -1,6 +1,6 @@
 import { ethersProvider } from "@/utils/rainbowConfig";
 import { ethers } from "ethers";
-import abi from "@/utils/abi.json";
+import spaceAbi from "@/contracts/ABI/Space.json";
 import {
   IHybridPaymaster,
   PaymasterMode,
@@ -8,6 +8,7 @@ import {
 } from "@biconomy/paymaster";
 import toast from "react-hot-toast";
 import { BiconomySmartAccountV2 } from "@biconomy/account";
+import spaceContractAddress from "@/utils/contractAddress";
 
 type useAccountAbstractionProps = {
   setDisabled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,11 +17,9 @@ type useAccountAbstractionProps = {
   smartAccount: BiconomySmartAccountV2 | undefined;
 };
 
-const spaceContractAddress = "0xC715299A729f9E4d2bb9239D39515Eb0996e7BD7";
-
 export const contract = new ethers.Contract(
   spaceContractAddress,
-  abi,
+  spaceAbi,
   ethersProvider
 );
 

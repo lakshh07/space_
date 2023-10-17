@@ -18,9 +18,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { MetadataType } from "../Card";
 import { ethers } from "ethers";
-import useAccountAbstraction, {
-  contract,
-} from "@/app/hooks/useAccountAbstraction";
+import useAccountAbstraction, { contract } from "@/hooks/useAccountAbstraction";
 import { useSmartAccountContext } from "@/context/userAccount";
 import { useAccount, useWaitForTransaction } from "wagmi";
 import toast from "react-hot-toast";

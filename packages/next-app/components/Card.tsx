@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchIpfsCid } from "@/app/hooks/useWeb3StorageClient";
+import { fetchIpfsCid } from "@/hooks/useWeb3StorageClient";
 import {
   Badge,
   Box,
@@ -200,7 +200,7 @@ export const Card: React.FC<CardProps> = ({
         <QuestModal
           isOpen={isOpen}
           onClose={onClose}
-          id={index}
+          id={index + 1}
           creator={creator}
           status={status}
           metadata={data}
