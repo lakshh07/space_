@@ -8,13 +8,28 @@ library SafeMath {
     function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require((z = x + y) >= x, "ds-math-add-overflow");
     }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        unchecked {
+            require(b <= a);
+            return a - b;
+        }
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        unchecked {
+            require(b > 0);
+            return a / b;
+        }
+    }
+
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a * b;
+    }
 }
 
 library Counters {
     struct Counter {
-        // This variable should never be directly accessed by users of the library: interactions must be restricted to
-        // the library's function. As of Solidity v0.5.2, this cannot be enforced, though there is a proposal to add
-        // this feature: see https://github.com/ethereum/solidity/issues/4637
         uint256 _value; // default: 0
     }
 
@@ -47,7 +62,7 @@ contract Space_ is Ownable, ReentrancyGuard {
     Counters.Counter private _questsCount;
     Counters.Counter private _campaignsCount;
     Counters.Counter private _donorsListCount;
-    uint256 private _systemFee;
+    uint256 private _systemFee = 1;
 
     struct Creator {
         address creator;
@@ -85,7 +100,9 @@ contract Space_ is Ownable, ReentrancyGuard {
 
     constructor(address initialOwner) Ownable(initialOwner) {}
 
-    event CreatorMetadataChanged();
+    event CreatorMetadataChanged(address creator, string metadata);
+
+    event CreatorVerified(address creator, bool isVerified);
 
     event QuestCreated(
         string id,
@@ -134,6 +151,10 @@ contract Space_ is Ownable, ReentrancyGuard {
         uint256 totalDonors
     );
 
+    event QuestDeleted(uint256 id);
+
+    event CampaignDeleted(uint256 id);
+
     mapping(address => Creator) addressToCreator;
     mapping(uint256 => Quest) idToQuest;
     mapping(uint256 => Campaign) idToCampaign;
@@ -155,11 +176,13 @@ contract Space_ is Ownable, ReentrancyGuard {
         _questsCount.increment();
         uint256 questCount = _questsCount.current();
 
+        uint256 systemCut = _amount.mul(_systemFee).div(100);
+
         idToQuest[questCount] = Quest(
             _id,
             _creator,
             _metadata,
-            _amount,
+            _amount.add(systemCut),
             false,
             _xp,
             address(0),
@@ -170,7 +193,7 @@ contract Space_ is Ownable, ReentrancyGuard {
             _id,
             _creator,
             _metadata,
-            _amount,
+            _amount.add(systemCut),
             false,
             _xp,
             address(0),
@@ -190,13 +213,6 @@ contract Space_ is Ownable, ReentrancyGuard {
         emit QuestUserAdded(_questId, _interestedUserAddress, _userComment);
     }
 
-    function fetchInterestedUserComment(
-        uint256 _questId,
-        address _interestedUserAddress
-    ) external view returns (string memory) {
-        return interstedUserComments[_questId][_interestedUserAddress];
-    }
-
     function approveQuestInterestedUser(
         uint256 _id,
         address _interestedUser
@@ -214,12 +230,19 @@ contract Space_ is Ownable, ReentrancyGuard {
 
         address assignedUser = idToQuest[_id].assigned;
 
-        (bool sent, ) = assignedUser.call{value: msg.value}("");
+        uint256 systemCut = msg.value.mul(_systemFee).div(100);
+
+        (bool fees, ) = owner().call{value: systemCut}("");
+        require(fees, "Failed to transfer system fees");
+
+        (bool sent, ) = assignedUser.call{value: msg.value.sub(systemCut)}("");
         require(sent, "Failed to transfer amoun to assigned user");
 
         idToQuest[_id].status = true;
         addressToCreator[assignedUser].creator = assignedUser;
-        addressToCreator[assignedUser].totalXP += idToQuest[_id].xp;
+        addressToCreator[assignedUser].totalXP = addressToCreator[assignedUser]
+            .totalXP
+            .add(idToQuest[_id].xp);
 
         emit QuestCompleted(
             _id,
@@ -274,25 +297,36 @@ contract Space_ is Ownable, ReentrancyGuard {
             "amount should not be greater than the total amount"
         );
 
-        (bool sent, ) = idToCampaign[_id].creator.call{value: msg.value}("");
+        uint256 systemCut = msg.value.mul(_systemFee).div(100);
+
+        (bool fees, ) = owner().call{value: systemCut}("");
+        require(fees, "Failed to transfer system fees");
+
+        (bool sent, ) = idToCampaign[_id].creator.call{
+            value: msg.value.sub(systemCut)
+        }("");
         require(sent, "Failed to transfer amount to creator");
 
-        idToCampaign[_id].totalDonors.add(1);
-        idToCampaign[_id].donatedAmount.add(msg.value);
+        idToCampaign[_id].totalDonors = idToCampaign[_id].totalDonors.add(1);
+        idToCampaign[_id].donatedAmount = idToCampaign[_id].donatedAmount.add(
+            msg.value.sub(systemCut)
+        );
 
         idToDonor[_id][idToCampaign[_id].totalDonors] = Donor(
             msg.sender,
-            msg.value
+            msg.value.sub(systemCut)
         );
 
-        addressToCreator[msg.sender].totalXP = idToCampaign[_id].xp;
+        addressToCreator[msg.sender].totalXP = addressToCreator[msg.sender]
+            .totalXP
+            .add(idToCampaign[_id].xp);
         addressToCreator[msg.sender].creator = msg.sender;
 
         emit DonateToCampaign(
             _id,
             idToCampaign[_id].donatedAmount,
             msg.sender,
-            msg.value,
+            msg.value.sub(systemCut),
             idToCampaign[_id].totalDonors
         );
     }
@@ -305,7 +339,51 @@ contract Space_ is Ownable, ReentrancyGuard {
         emit CampaignStatusChanged(_id, true);
     }
 
-    function deleteQuest() external nonReentrant {}
+    function deleteQuest(uint256 _id) external nonReentrant {
+        delete idToQuest[_id];
+
+        emit QuestDeleted(_id);
+    }
+
+    function deleteCamapign(uint256 _id) external nonReentrant {
+        delete idToCampaign[_id];
+
+        emit CampaignDeleted(_id);
+    }
+
+    function changeProfileMetadata(
+        string memory _metadata,
+        address _creator
+    ) external nonReentrant {
+        addressToCreator[_creator].metadata = _metadata;
+
+        emit CreatorMetadataChanged(_creator, _metadata);
+    }
+
+    function changeCreatorVerification(address _creator) external nonReentrant {
+        addressToCreator[_creator].isVerified = true;
+
+        emit CreatorVerified(_creator, true);
+    }
+
+    function changeSystemFee(
+        uint256 _newSystemFee
+    ) external nonReentrant onlyOwner {
+        _systemFee = _newSystemFee;
+    }
+
+    function fetchCreatorsDetails(
+        address _creator
+    ) external view returns (Creator memory) {
+        return addressToCreator[_creator];
+    }
+
+    function fetchInterestedUserComment(
+        uint256 _questId,
+        address _interestedUserAddress
+    ) external view returns (string memory) {
+        return interstedUserComments[_questId][_interestedUserAddress];
+    }
 
     function getDonors(uint256 _id) external view returns (Donor[] memory) {
         uint256 totalDonorCount = idToCampaign[_id].totalDonors;
@@ -320,10 +398,6 @@ contract Space_ is Ownable, ReentrancyGuard {
             currentIndex += 1;
         }
         return donor;
-    }
-
-    function changeSystemFee(uint256 _newSystemFee) external nonReentrant {
-        _systemFee = _newSystemFee;
     }
 
     function fetchQuests() external view returns (Quest[] memory) {

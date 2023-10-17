@@ -12,19 +12,19 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  // defaultNetwork: "mumbai",
+  defaultNetwork: "mumbai",
   networks: {
     hardhat: {
       chainId: 1337,
     },
-    // mumbai: {
-    //   url: `${process.env.MUMBAI_ALCHEMY_KEY}`,
-    //   accounts: [`0x${process.env.PK}`],
-    // },
-    // polygon: {
-    //   url: `${process.env.POLYGON_ALCHEMY_KEY}`,
-    //   accounts: [`0x${process.env.PK}`],
-    // },
+    mumbai: {
+      url: `${process.env.MUMBAI_ALCHEMY_KEY}`,
+      accounts: [`0x${process.env.PK}`],
+    },
+    polygon: {
+      url: `${process.env.POLYGON_ALCHEMY_KEY}`,
+      accounts: [`0x${process.env.PK}`],
+    },
   },
 };
 

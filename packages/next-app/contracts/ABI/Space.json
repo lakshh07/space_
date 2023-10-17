@@ -49,27 +49,8 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "assignerAddress",
-        "type": "address"
-      }
-    ],
-    "name": "AssignerAdded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
         "name": "assignerList",
-        "type": "string"
+        "type": "address"
       }
     ],
     "name": "AssignersAdded",
@@ -138,6 +119,19 @@
         "internalType": "uint256",
         "name": "id",
         "type": "uint256"
+      }
+    ],
+    "name": "CampaignDeleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -151,8 +145,40 @@
   },
   {
     "anonymous": false,
-    "inputs": [],
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadata",
+        "type": "string"
+      }
+    ],
     "name": "CreatorMetadataChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "creator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isVerified",
+        "type": "bool"
+      }
+    ],
+    "name": "CreatorVerified",
     "type": "event"
   },
   {
@@ -237,12 +263,6 @@
         "internalType": "uint256",
         "name": "creatorXP",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "creatorAddress",
-        "type": "address"
       }
     ],
     "name": "QuestCompleted",
@@ -292,6 +312,12 @@
         "internalType": "address",
         "name": "assigned",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "interestedUsers",
+        "type": "string"
       }
     ],
     "name": "QuestCreated",
@@ -302,19 +328,66 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "string",
+        "internalType": "uint256",
         "name": "id",
-        "type": "string"
+        "type": "uint256"
+      }
+    ],
+    "name": "QuestDeleted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "questId",
+        "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "bool",
-        "name": "status",
-        "type": "bool"
+        "internalType": "address",
+        "name": "interestedUserAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "userComment",
+        "type": "string"
       }
     ],
-    "name": "QuestStatusChanged",
+    "name": "QuestUserAdded",
     "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_questId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "_interestedUserAddresses",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_interestedUserAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "_userComment",
+        "type": "string"
+      }
+    ],
+    "name": "addQuestUser",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
     "inputs": [
@@ -324,12 +397,12 @@
         "type": "uint256"
       },
       {
-        "internalType": "string",
-        "name": "_assignersList",
-        "type": "string"
+        "internalType": "address",
+        "name": "_interestedUser",
+        "type": "address"
       }
     ],
-    "name": "approveQuestByInfluencer",
+    "name": "approveQuestInterestedUser",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -343,6 +416,37 @@
       }
     ],
     "name": "changeCampaignStatus",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_creator",
+        "type": "address"
+      }
+    ],
+    "name": "changeCreatorVerification",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_metadata",
+        "type": "string"
+      },
+      {
+        "internalType": "address",
+        "name": "_creator",
+        "type": "address"
+      }
+    ],
+    "name": "changeProfileMetadata",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -373,6 +477,11 @@
         "type": "string"
       },
       {
+        "internalType": "address",
+        "name": "_creator",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_totalAmount",
         "type": "uint256"
@@ -401,6 +510,11 @@
         "type": "string"
       },
       {
+        "internalType": "address",
+        "name": "_creator",
+        "type": "address"
+      },
+      {
         "internalType": "uint256",
         "name": "_amount",
         "type": "uint256"
@@ -417,7 +531,26 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
+    "name": "deleteCamapign",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      }
+    ],
     "name": "deleteQuest",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -553,6 +686,71 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_creator",
+        "type": "address"
+      }
+    ],
+    "name": "fetchCreatorsDetails",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "creator",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isVerified",
+            "type": "bool"
+          },
+          {
+            "internalType": "string",
+            "name": "metadata",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalXP",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct Space_.Creator",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_questId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_interestedUserAddress",
+        "type": "address"
+      }
+    ],
+    "name": "fetchInterestedUserComment",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "fetchQuests",
     "outputs": [
@@ -592,6 +790,11 @@
             "internalType": "address",
             "name": "assigned",
             "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "interestedUsers",
+            "type": "string"
           }
         ],
         "internalType": "struct Space_.Quest[]",
@@ -652,29 +855,6 @@
         "internalType": "uint256",
         "name": "_id",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_assignerAddress",
-        "type": "address"
-      }
-    ],
-    "name": "questAssigned",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_id",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address payable",
-        "name": "_assignerAddress",
-        "type": "address"
       }
     ],
     "name": "questComplete",
