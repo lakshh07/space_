@@ -2,7 +2,7 @@ specVersion: 0.0.5
 features:
   - fullTextSearch
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: Space_
@@ -22,7 +22,7 @@ dataSources:
         - Donor
       abis:
         - name: Space_
-          file: ./abis/Space_.json
+          file: Space_/abis/Space_.json
       eventHandlers:
         - event: CampaignCreated(string,address,string,uint256,uint256,uint256,bool,uint256)
           handler: handleCampaignCreated
@@ -48,4 +48,4 @@ dataSources:
           handler: handleQuestDeleted
         - event: QuestUserAdded(string,string,string)
           handler: handleQuestUserAdded
-      file: ./src/space.ts
+      file: Space_/Space_.wasm
