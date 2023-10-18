@@ -42,25 +42,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "assignerList",
-        "type": "address"
-      }
-    ],
-    "name": "AssignersAdded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "string",
         "name": "id",
         "type": "string"
@@ -116,9 +97,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "string",
         "name": "id",
-        "type": "uint256"
+        "type": "string"
       }
     ],
     "name": "CampaignDeleted",
@@ -129,9 +110,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "string",
         "name": "id",
-        "type": "uint256"
+        "type": "string"
       },
       {
         "indexed": false,
@@ -186,9 +167,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "string",
         "name": "id",
-        "type": "uint256"
+        "type": "string"
       },
       {
         "indexed": false,
@@ -201,6 +182,12 @@
         "internalType": "address",
         "name": "donorAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "donorXP",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -242,9 +229,28 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "string",
         "name": "id",
-        "type": "uint256"
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "interestedUser",
+        "type": "address"
+      }
+    ],
+    "name": "QuestAssigned",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
       },
       {
         "indexed": false,
@@ -328,9 +334,9 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
+        "internalType": "string",
         "name": "id",
-        "type": "uint256"
+        "type": "string"
       }
     ],
     "name": "QuestDeleted",
@@ -341,15 +347,15 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "questId",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "interestedUserAddress",
-        "type": "address"
+        "internalType": "string",
+        "name": "interestedUserAddresses",
+        "type": "string"
       },
       {
         "indexed": false,
@@ -817,6 +823,11 @@
     "outputs": [
       {
         "components": [
+          {
+            "internalType": "string",
+            "name": "id",
+            "type": "string"
+          },
           {
             "internalType": "address",
             "name": "donor",

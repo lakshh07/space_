@@ -64,7 +64,7 @@ export const CampaignsClient: React.FC = () => {
       uuidv4(),
       cid.toString(),
       address,
-      parseFloat(newAmount.toString()),
+      newAmount.toString(),
       campaignData.xp
     );
 

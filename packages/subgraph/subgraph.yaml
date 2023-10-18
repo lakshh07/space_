@@ -6,15 +6,14 @@ dataSources:
     name: Space_
     network: mumbai
     source:
-      address: "0x4e66a787081c05D670def58b358B3D46E2cDb95D"
+      address: "0x243a6fc4FbA9B7a6f3aD7AB554f4E8943Ef521CA"
       abi: Space_
-      startBlock: 41300415
+      startBlock: 41339406
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - AssignersAdded
         - CampaignCreated
         - CampaignDeleted
         - CampaignStatusChanged
@@ -22,6 +21,7 @@ dataSources:
         - CreatorVerified
         - DonateToCampaign
         - OwnershipTransferred
+        - QuestAssigned
         - QuestCompleted
         - QuestCreated
         - QuestDeleted
@@ -30,28 +30,28 @@ dataSources:
         - name: Space_
           file: ./abis/Space_.json
       eventHandlers:
-        - event: AssignersAdded(uint256,address)
-          handler: handleAssignersAdded
         - event: CampaignCreated(string,address,string,uint256,uint256,uint256,bool,uint256)
           handler: handleCampaignCreated
-        - event: CampaignDeleted(uint256)
+        - event: CampaignDeleted(string)
           handler: handleCampaignDeleted
-        - event: CampaignStatusChanged(uint256,bool)
+        - event: CampaignStatusChanged(string,bool)
           handler: handleCampaignStatusChanged
         - event: CreatorMetadataChanged(address,string)
           handler: handleCreatorMetadataChanged
         - event: CreatorVerified(address,bool)
           handler: handleCreatorVerified
-        - event: DonateToCampaign(uint256,uint256,address,uint256,uint256)
+        - event: DonateToCampaign(string,uint256,address,uint256,uint256,uint256)
           handler: handleDonateToCampaign
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: QuestCompleted(uint256,address,bool,uint256)
+        - event: QuestAssigned(string,address)
+          handler: handleQuestAssigned
+        - event: QuestCompleted(string,address,bool,uint256)
           handler: handleQuestCompleted
         - event: QuestCreated(string,address,string,uint256,bool,uint256,address,string)
           handler: handleQuestCreated
-        - event: QuestDeleted(uint256)
+        - event: QuestDeleted(string)
           handler: handleQuestDeleted
-        - event: QuestUserAdded(uint256,address,string)
+        - event: QuestUserAdded(string,string,string)
           handler: handleQuestUserAdded
       file: ./src/space.ts

@@ -6,23 +6,38 @@ import {
   beforeAll,
   afterAll
 } from "matchstick-as/assembly/index"
-import { BigInt, Address } from "@graphprotocol/graph-ts"
-import { AssignersAdded } from "../generated/schema"
-import { AssignersAdded as AssignersAddedEvent } from "../generated/Space_/Space_"
-import { handleAssignersAdded } from "../src/space"
-import { createAssignersAddedEvent } from "./space-utils"
+import { Address, BigInt } from "@graphprotocol/graph-ts"
+import { CampaignCreated } from "../generated/schema"
+import { CampaignCreated as CampaignCreatedEvent } from "../generated/Space_/Space_"
+import { handleCampaignCreated } from "../src/space"
+import { createCampaignCreatedEvent } from "./space-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
 
 describe("Describe entity assertions", () => {
   beforeAll(() => {
-    let id = BigInt.fromI32(234)
-    let assignerList = Address.fromString(
+    let id = "Example string value"
+    let creator = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
-    let newAssignersAddedEvent = createAssignersAddedEvent(id, assignerList)
-    handleAssignersAdded(newAssignersAddedEvent)
+    let metadata = "Example string value"
+    let totalAmount = BigInt.fromI32(234)
+    let donatedAmount = BigInt.fromI32(234)
+    let totalDonors = BigInt.fromI32(234)
+    let status = "boolean Not implemented"
+    let xp = BigInt.fromI32(234)
+    let newCampaignCreatedEvent = createCampaignCreatedEvent(
+      id,
+      creator,
+      metadata,
+      totalAmount,
+      donatedAmount,
+      totalDonors,
+      status,
+      xp
+    )
+    handleCampaignCreated(newCampaignCreatedEvent)
   })
 
   afterAll(() => {
@@ -32,15 +47,51 @@ describe("Describe entity assertions", () => {
   // For more test scenarios, see:
   // https://thegraph.com/docs/en/developer/matchstick/#write-a-unit-test
 
-  test("AssignersAdded created and stored", () => {
-    assert.entityCount("AssignersAdded", 1)
+  test("CampaignCreated created and stored", () => {
+    assert.entityCount("CampaignCreated", 1)
 
     // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
     assert.fieldEquals(
-      "AssignersAdded",
+      "CampaignCreated",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "assignerList",
+      "creator",
       "0x0000000000000000000000000000000000000001"
+    )
+    assert.fieldEquals(
+      "CampaignCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "metadata",
+      "Example string value"
+    )
+    assert.fieldEquals(
+      "CampaignCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "totalAmount",
+      "234"
+    )
+    assert.fieldEquals(
+      "CampaignCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "donatedAmount",
+      "234"
+    )
+    assert.fieldEquals(
+      "CampaignCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "totalDonors",
+      "234"
+    )
+    assert.fieldEquals(
+      "CampaignCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "status",
+      "boolean Not implemented"
+    )
+    assert.fieldEquals(
+      "CampaignCreated",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "xp",
+      "234"
     )
 
     // More assert options:

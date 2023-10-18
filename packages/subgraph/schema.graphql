@@ -1,12 +1,3 @@
-type AssignersAdded @entity(immutable: true) {
-  id: Bytes!
-  Space__id: BigInt! # uint256
-  assignerList: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
 type CampaignCreated @entity(immutable: true) {
   id: Bytes!
   Space__id: String! # string
@@ -24,7 +15,7 @@ type CampaignCreated @entity(immutable: true) {
 
 type CampaignDeleted @entity(immutable: true) {
   id: Bytes!
-  Space__id: BigInt! # uint256
+  Space__id: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -32,7 +23,7 @@ type CampaignDeleted @entity(immutable: true) {
 
 type CampaignStatusChanged @entity(immutable: true) {
   id: Bytes!
-  Space__id: BigInt! # uint256
+  Space__id: String! # string
   status: Boolean! # bool
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -59,9 +50,10 @@ type CreatorVerified @entity(immutable: true) {
 
 type DonateToCampaign @entity(immutable: true) {
   id: Bytes!
-  Space__id: BigInt! # uint256
+  Space__id: String! # string
   totalDonatedAmount: BigInt! # uint256
   donorAddress: Bytes! # address
+  donorXP: BigInt! # uint256
   donorAmount: BigInt! # uint256
   totalDonors: BigInt! # uint256
   blockNumber: BigInt!
@@ -78,9 +70,18 @@ type OwnershipTransferred @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+type QuestAssigned @entity(immutable: true) {
+  id: Bytes!
+  Space__id: String! # string
+  interestedUser: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type QuestCompleted @entity(immutable: true) {
   id: Bytes!
-  Space__id: BigInt! # uint256
+  Space__id: String! # string
   assignerAddress: Bytes! # address
   questStatus: Boolean! # bool
   creatorXP: BigInt! # uint256
@@ -106,7 +107,7 @@ type QuestCreated @entity(immutable: true) {
 
 type QuestDeleted @entity(immutable: true) {
   id: Bytes!
-  Space__id: BigInt! # uint256
+  Space__id: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
@@ -114,8 +115,8 @@ type QuestDeleted @entity(immutable: true) {
 
 type QuestUserAdded @entity(immutable: true) {
   id: Bytes!
-  questId: BigInt! # uint256
-  interestedUserAddress: Bytes! # address
+  Space__id: String! # string
+  interestedUserAddresses: String! # string
   userComment: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!

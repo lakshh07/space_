@@ -1,7 +1,6 @@
 import { newMockEvent } from "matchstick-as"
-import { ethereum, BigInt, Address } from "@graphprotocol/graph-ts"
+import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
 import {
-  AssignersAdded,
   CampaignCreated,
   CampaignDeleted,
   CampaignStatusChanged,
@@ -9,32 +8,12 @@ import {
   CreatorVerified,
   DonateToCampaign,
   OwnershipTransferred,
+  QuestAssigned,
   QuestCompleted,
   QuestCreated,
   QuestDeleted,
   QuestUserAdded
 } from "../generated/Space_/Space_"
-
-export function createAssignersAddedEvent(
-  id: BigInt,
-  assignerList: Address
-): AssignersAdded {
-  let assignersAddedEvent = changetype<AssignersAdded>(newMockEvent())
-
-  assignersAddedEvent.parameters = new Array()
-
-  assignersAddedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
-  )
-  assignersAddedEvent.parameters.push(
-    new ethereum.EventParam(
-      "assignerList",
-      ethereum.Value.fromAddress(assignerList)
-    )
-  )
-
-  return assignersAddedEvent
-}
 
 export function createCampaignCreatedEvent(
   id: string,
@@ -87,20 +66,20 @@ export function createCampaignCreatedEvent(
   return campaignCreatedEvent
 }
 
-export function createCampaignDeletedEvent(id: BigInt): CampaignDeleted {
+export function createCampaignDeletedEvent(id: string): CampaignDeleted {
   let campaignDeletedEvent = changetype<CampaignDeleted>(newMockEvent())
 
   campaignDeletedEvent.parameters = new Array()
 
   campaignDeletedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
+    new ethereum.EventParam("id", ethereum.Value.fromString(id))
   )
 
   return campaignDeletedEvent
 }
 
 export function createCampaignStatusChangedEvent(
-  id: BigInt,
+  id: string,
   status: boolean
 ): CampaignStatusChanged {
   let campaignStatusChangedEvent = changetype<CampaignStatusChanged>(
@@ -110,7 +89,7 @@ export function createCampaignStatusChangedEvent(
   campaignStatusChangedEvent.parameters = new Array()
 
   campaignStatusChangedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
+    new ethereum.EventParam("id", ethereum.Value.fromString(id))
   )
   campaignStatusChangedEvent.parameters.push(
     new ethereum.EventParam("status", ethereum.Value.fromBoolean(status))
@@ -161,9 +140,10 @@ export function createCreatorVerifiedEvent(
 }
 
 export function createDonateToCampaignEvent(
-  id: BigInt,
+  id: string,
   totalDonatedAmount: BigInt,
   donorAddress: Address,
+  donorXP: BigInt,
   donorAmount: BigInt,
   totalDonors: BigInt
 ): DonateToCampaign {
@@ -172,7 +152,7 @@ export function createDonateToCampaignEvent(
   donateToCampaignEvent.parameters = new Array()
 
   donateToCampaignEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
+    new ethereum.EventParam("id", ethereum.Value.fromString(id))
   )
   donateToCampaignEvent.parameters.push(
     new ethereum.EventParam(
@@ -184,6 +164,12 @@ export function createDonateToCampaignEvent(
     new ethereum.EventParam(
       "donorAddress",
       ethereum.Value.fromAddress(donorAddress)
+    )
+  )
+  donateToCampaignEvent.parameters.push(
+    new ethereum.EventParam(
+      "donorXP",
+      ethereum.Value.fromUnsignedBigInt(donorXP)
     )
   )
   donateToCampaignEvent.parameters.push(
@@ -225,8 +211,29 @@ export function createOwnershipTransferredEvent(
   return ownershipTransferredEvent
 }
 
+export function createQuestAssignedEvent(
+  id: string,
+  interestedUser: Address
+): QuestAssigned {
+  let questAssignedEvent = changetype<QuestAssigned>(newMockEvent())
+
+  questAssignedEvent.parameters = new Array()
+
+  questAssignedEvent.parameters.push(
+    new ethereum.EventParam("id", ethereum.Value.fromString(id))
+  )
+  questAssignedEvent.parameters.push(
+    new ethereum.EventParam(
+      "interestedUser",
+      ethereum.Value.fromAddress(interestedUser)
+    )
+  )
+
+  return questAssignedEvent
+}
+
 export function createQuestCompletedEvent(
-  id: BigInt,
+  id: string,
   assignerAddress: Address,
   questStatus: boolean,
   creatorXP: BigInt
@@ -236,7 +243,7 @@ export function createQuestCompletedEvent(
   questCompletedEvent.parameters = new Array()
 
   questCompletedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
+    new ethereum.EventParam("id", ethereum.Value.fromString(id))
   )
   questCompletedEvent.parameters.push(
     new ethereum.EventParam(
@@ -305,21 +312,21 @@ export function createQuestCreatedEvent(
   return questCreatedEvent
 }
 
-export function createQuestDeletedEvent(id: BigInt): QuestDeleted {
+export function createQuestDeletedEvent(id: string): QuestDeleted {
   let questDeletedEvent = changetype<QuestDeleted>(newMockEvent())
 
   questDeletedEvent.parameters = new Array()
 
   questDeletedEvent.parameters.push(
-    new ethereum.EventParam("id", ethereum.Value.fromUnsignedBigInt(id))
+    new ethereum.EventParam("id", ethereum.Value.fromString(id))
   )
 
   return questDeletedEvent
 }
 
 export function createQuestUserAddedEvent(
-  questId: BigInt,
-  interestedUserAddress: Address,
+  id: string,
+  interestedUserAddresses: string,
   userComment: string
 ): QuestUserAdded {
   let questUserAddedEvent = changetype<QuestUserAdded>(newMockEvent())
@@ -327,15 +334,12 @@ export function createQuestUserAddedEvent(
   questUserAddedEvent.parameters = new Array()
 
   questUserAddedEvent.parameters.push(
-    new ethereum.EventParam(
-      "questId",
-      ethereum.Value.fromUnsignedBigInt(questId)
-    )
+    new ethereum.EventParam("id", ethereum.Value.fromString(id))
   )
   questUserAddedEvent.parameters.push(
     new ethereum.EventParam(
-      "interestedUserAddress",
-      ethereum.Value.fromAddress(interestedUserAddress)
+      "interestedUserAddresses",
+      ethereum.Value.fromString(interestedUserAddresses)
     )
   )
   questUserAddedEvent.parameters.push(

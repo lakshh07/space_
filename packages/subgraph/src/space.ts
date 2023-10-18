@@ -1,5 +1,4 @@
 import {
-  AssignersAdded as AssignersAddedEvent,
   CampaignCreated as CampaignCreatedEvent,
   CampaignDeleted as CampaignDeletedEvent,
   CampaignStatusChanged as CampaignStatusChangedEvent,
@@ -7,13 +6,13 @@ import {
   CreatorVerified as CreatorVerifiedEvent,
   DonateToCampaign as DonateToCampaignEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
+  QuestAssigned as QuestAssignedEvent,
   QuestCompleted as QuestCompletedEvent,
   QuestCreated as QuestCreatedEvent,
   QuestDeleted as QuestDeletedEvent,
   QuestUserAdded as QuestUserAddedEvent
 } from "../generated/Space_/Space_"
 import {
-  AssignersAdded,
   CampaignCreated,
   CampaignDeleted,
   CampaignStatusChanged,
@@ -21,25 +20,12 @@ import {
   CreatorVerified,
   DonateToCampaign,
   OwnershipTransferred,
+  QuestAssigned,
   QuestCompleted,
   QuestCreated,
   QuestDeleted,
   QuestUserAdded
 } from "../generated/schema"
-
-export function handleAssignersAdded(event: AssignersAddedEvent): void {
-  let entity = new AssignersAdded(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.Space__id = event.params.id
-  entity.assignerList = event.params.assignerList
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
 
 export function handleCampaignCreated(event: CampaignCreatedEvent): void {
   let entity = new CampaignCreated(
@@ -127,6 +113,7 @@ export function handleDonateToCampaign(event: DonateToCampaignEvent): void {
   entity.Space__id = event.params.id
   entity.totalDonatedAmount = event.params.totalDonatedAmount
   entity.donorAddress = event.params.donorAddress
+  entity.donorXP = event.params.donorXP
   entity.donorAmount = event.params.donorAmount
   entity.totalDonors = event.params.totalDonors
 
@@ -145,6 +132,20 @@ export function handleOwnershipTransferred(
   )
   entity.previousOwner = event.params.previousOwner
   entity.newOwner = event.params.newOwner
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleQuestAssigned(event: QuestAssignedEvent): void {
+  let entity = new QuestAssigned(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.Space__id = event.params.id
+  entity.interestedUser = event.params.interestedUser
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -206,8 +207,8 @@ export function handleQuestUserAdded(event: QuestUserAddedEvent): void {
   let entity = new QuestUserAdded(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
-  entity.questId = event.params.questId
-  entity.interestedUserAddress = event.params.interestedUserAddress
+  entity.Space__id = event.params.id
+  entity.interestedUserAddresses = event.params.interestedUserAddresses
   entity.userComment = event.params.userComment
 
   entity.blockNumber = event.block.number

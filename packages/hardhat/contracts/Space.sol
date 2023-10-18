@@ -74,7 +74,7 @@ contract Space_ is Ownable, ReentrancyGuard {
     struct Campaign {
         string id;
         address creator;
-        string metadata; //title, description, duration
+        string metadata;
         uint256 totalAmount;
         uint256 donatedAmount;
         uint256 totalDonors;
@@ -85,7 +85,7 @@ contract Space_ is Ownable, ReentrancyGuard {
     struct Quest {
         string id;
         address creator;
-        string metadata; //title, description, duration
+        string metadata;
         uint256 amount;
         bool status;
         uint256 xp;
@@ -94,15 +94,12 @@ contract Space_ is Ownable, ReentrancyGuard {
     }
 
     struct Donor {
+        string id;
         address donor;
         uint256 amount;
     }
 
     constructor(address initialOwner) Ownable(initialOwner) {}
-
-    event CreatorMetadataChanged(address creator, string metadata);
-
-    event CreatorVerified(address creator, bool isVerified);
 
     event QuestCreated(
         string id,
@@ -115,10 +112,25 @@ contract Space_ is Ownable, ReentrancyGuard {
         string interestedUsers
     );
 
+    event QuestUserAdded(
+        string id,
+        string interestedUserAddresses,
+        string userComment
+    );
+
+    event QuestAssigned(string id, address interestedUser);
+
+    event QuestCompleted(
+        string id,
+        address assignerAddress,
+        bool questStatus,
+        uint256 creatorXP
+    );
+
     event CampaignCreated(
         string id,
         address creator,
-        string metadata, //title, description, duration
+        string metadata,
         uint256 totalAmount,
         uint256 donatedAmount,
         uint256 totalDonors,
@@ -126,34 +138,24 @@ contract Space_ is Ownable, ReentrancyGuard {
         uint256 xp
     );
 
-    event CampaignStatusChanged(uint256 id, bool status);
-
-    event AssignersAdded(uint256 id, address assignerList);
-
-    event QuestUserAdded(
-        uint256 questId,
-        address interestedUserAddress,
-        string userComment
-    );
-
-    event QuestCompleted(
-        uint256 id,
-        address assignerAddress,
-        bool questStatus,
-        uint256 creatorXP
-    );
-
     event DonateToCampaign(
-        uint256 id,
+        string id,
         uint256 totalDonatedAmount,
         address donorAddress,
+        uint256 donorXP,
         uint256 donorAmount,
         uint256 totalDonors
     );
 
-    event QuestDeleted(uint256 id);
+    event CampaignStatusChanged(string id, bool status);
 
-    event CampaignDeleted(uint256 id);
+    event QuestDeleted(string id);
+
+    event CampaignDeleted(string id);
+
+    event CreatorMetadataChanged(address creator, string metadata);
+
+    event CreatorVerified(address creator, bool isVerified);
 
     mapping(address => Creator) addressToCreator;
     mapping(uint256 => Quest) idToQuest;
@@ -210,7 +212,11 @@ contract Space_ is Ownable, ReentrancyGuard {
         idToQuest[_questId].interestedUsers = _interestedUserAddresses;
         interstedUserComments[_questId][_interestedUserAddress] = _userComment;
 
-        emit QuestUserAdded(_questId, _interestedUserAddress, _userComment);
+        emit QuestUserAdded(
+            idToQuest[_questId].id,
+            _interestedUserAddresses,
+            _userComment
+        );
     }
 
     function approveQuestInterestedUser(
@@ -219,7 +225,7 @@ contract Space_ is Ownable, ReentrancyGuard {
     ) external nonReentrant {
         idToQuest[_id].assigned = _interestedUser;
 
-        emit AssignersAdded(_id, _interestedUser);
+        emit QuestAssigned(idToQuest[_id].id, _interestedUser);
     }
 
     function questComplete(uint256 _id) external payable nonReentrant {
@@ -245,7 +251,7 @@ contract Space_ is Ownable, ReentrancyGuard {
             .add(idToQuest[_id].xp);
 
         emit QuestCompleted(
-            _id,
+            idToQuest[_id].id,
             assignedUser,
             true,
             addressToCreator[assignedUser].totalXP
@@ -254,7 +260,7 @@ contract Space_ is Ownable, ReentrancyGuard {
 
     function createCampaign(
         string memory _id,
-        string memory _metadata, //title, description, duration
+        string memory _metadata,
         address _creator,
         uint256 _totalAmount,
         uint256 _xp
@@ -313,6 +319,7 @@ contract Space_ is Ownable, ReentrancyGuard {
         );
 
         idToDonor[_id][idToCampaign[_id].totalDonors] = Donor(
+            idToCampaign[_id].id,
             msg.sender,
             msg.value.sub(systemCut)
         );
@@ -320,12 +327,14 @@ contract Space_ is Ownable, ReentrancyGuard {
         addressToCreator[msg.sender].totalXP = addressToCreator[msg.sender]
             .totalXP
             .add(idToCampaign[_id].xp);
+
         addressToCreator[msg.sender].creator = msg.sender;
 
         emit DonateToCampaign(
-            _id,
+            idToCampaign[_id].id,
             idToCampaign[_id].donatedAmount,
             msg.sender,
+            addressToCreator[msg.sender].totalXP.add(idToCampaign[_id].xp),
             msg.value.sub(systemCut),
             idToCampaign[_id].totalDonors
         );
@@ -336,19 +345,19 @@ contract Space_ is Ownable, ReentrancyGuard {
 
         idToCampaign[_id].status = true;
 
-        emit CampaignStatusChanged(_id, true);
+        emit CampaignStatusChanged(idToCampaign[_id].id, true);
     }
 
     function deleteQuest(uint256 _id) external nonReentrant {
         delete idToQuest[_id];
 
-        emit QuestDeleted(_id);
+        emit QuestDeleted(idToQuest[_id].id);
     }
 
     function deleteCamapign(uint256 _id) external nonReentrant {
         delete idToCampaign[_id];
 
-        emit CampaignDeleted(_id);
+        emit CampaignDeleted(idToCampaign[_id].id);
     }
 
     function changeProfileMetadata(
