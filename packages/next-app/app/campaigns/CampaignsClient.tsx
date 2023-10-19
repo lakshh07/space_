@@ -3,7 +3,7 @@
 import { fieldDataType } from "@/components/CreateModal";
 import { Header } from "@/components/Header";
 import { useSmartAccountContext } from "@/context/userAccount";
-import { Container } from "@chakra-ui/react";
+import { Container, Flex, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import { v4 as uuidv4 } from "uuid";
@@ -16,7 +16,8 @@ import { ethers } from "ethers";
 import { Range } from "react-date-range";
 import { Card } from "@/components/Card";
 import { useLoadingContext } from "@/context/loading";
-import axios from "axios";
+import { useQuery } from "urql";
+import useSubgraph from "@/hooks/useSubgraph";
 
 const initialDateRange = {
   startDate: new Date(),
@@ -50,17 +51,12 @@ export const CampaignsClient: React.FC = () => {
   const { smartAccount } = useSmartAccountContext();
   const { address } = useAccount();
   const { setMainLoading } = useLoadingContext();
-  const [data, setData] = useState<campaignDataType[]>([]);
+  const { campaignQuery } = useSubgraph();
 
-  const getData = async () => {
-    await axios.get("/api/quests").then((res) => {
-      setData(res?.data?.quests);
-    });
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
+  const [result, reexecuteQuery] = useQuery({
+    query: campaignQuery,
+  });
+  const { data, fetching } = result;
 
   useEffect(() => {
     setMainLoading(false);
@@ -116,7 +112,7 @@ export const CampaignsClient: React.FC = () => {
     <Container my={"4rem"} maxW={"1200px"}>
       <Header
         title="Campaigns"
-        length={data?.length || 0}
+        length={data?.campaigns?.length || 0}
         actionLabel="New Camapign"
         isCampaign={true}
         isLoading={loading}
@@ -128,20 +124,26 @@ export const CampaignsClient: React.FC = () => {
         onChangeDate={(value) => setDateRange(value)}
       />
 
-      {data?.map((list, index) => {
-        return (
-          <Card
-            key={index}
-            id={list.id}
-            index={index}
-            creator={list.creator}
-            amount={list.amount}
-            status={list.status}
-            metadata={list.metadata}
-            isCampaign={true}
-          />
-        );
-      })}
+      {fetching ? (
+        <Flex justifyContent={"center"} mt={"10em"}>
+          <Spinner />
+        </Flex>
+      ) : (
+        data?.campaigns?.map((list: campaignDataType, index: number) => {
+          return (
+            <Card
+              key={index}
+              id={list.id}
+              index={index}
+              creator={list.creator}
+              amount={list.amount}
+              status={list.status}
+              metadata={list.metadata}
+              isCampaign={true}
+            />
+          );
+        })
+      )}
     </Container>
   );
 };

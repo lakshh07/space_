@@ -20,6 +20,12 @@ type useAccountAbstractionProps = {
 export const contract = new ethers.Contract(
   spaceContractAddress,
   spaceAbi,
+  ethersProvider
+);
+
+export const signerContract = new ethers.Contract(
+  spaceContractAddress,
+  spaceAbi,
   ethersSigner
 );
 
@@ -91,10 +97,6 @@ const useAccountAbstraction = async ({
     }
   } catch (err) {
     console.error(err);
-    toast.error(err, {
-      id: toastId,
-    });
-    console.log(err);
   }
 };
 

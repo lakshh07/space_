@@ -1,219 +1,183 @@
 import {
+  QuestAssigned as QuestAssignedEvent,
   CampaignCreated as CampaignCreatedEvent,
   CampaignDeleted as CampaignDeletedEvent,
   CampaignStatusChanged as CampaignStatusChangedEvent,
   CreatorMetadataChanged as CreatorMetadataChangedEvent,
   CreatorVerified as CreatorVerifiedEvent,
   DonateToCampaign as DonateToCampaignEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
-  QuestAssigned as QuestAssignedEvent,
   QuestCompleted as QuestCompletedEvent,
   QuestCreated as QuestCreatedEvent,
   QuestDeleted as QuestDeletedEvent,
-  QuestUserAdded as QuestUserAddedEvent
-} from "../generated/space_/space_"
-import {
-  CampaignCreated,
-  CampaignDeleted,
-  CampaignStatusChanged,
-  CreatorMetadataChanged,
-  CreatorVerified,
-  DonateToCampaign,
-  OwnershipTransferred,
-  QuestAssigned,
-  QuestCompleted,
-  QuestCreated,
-  QuestDeleted,
-  QuestUserAdded
-} from "../generated/schema"
+  QuestUserAdded as QuestUserAddedEvent,
+  OwnershipTransferred as OwnershipTransferredEvent,
+} from "../generated/Space_/Space_";
+import { Campaign, Creator, Donor, Quest } from "../generated/schema";
 
-export function handleCampaignCreated(event: CampaignCreatedEvent): void {
-  let entity = new CampaignCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-  entity.creator = event.params.creator
-  entity.metadata = event.params.metadata
-  entity.totalAmount = event.params.totalAmount
-  entity.donatedAmount = event.params.donatedAmount
-  entity.totalDonors = event.params.totalDonors
-  entity.status = event.params.status
-  entity.xp = event.params.xp
+export function handleQuestCreated(event: QuestCreatedEvent): void {
+  let quest = new Quest(event.params.id.toString());
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  quest.id = event.params.id;
+  quest.amount = event.params.amount;
+  quest.assigned = event.params.assigned;
+  quest.creator = event.params.creator;
+  quest.metadata = event.params.metadata;
+  quest.interestedUsers = event.params.interestedUsers;
+  quest.status = event.params.status;
+  quest.xp = event.params.xp;
 
-  entity.save()
+  quest.save();
 }
 
-export function handleCampaignDeleted(event: CampaignDeletedEvent): void {
-  let entity = new CampaignDeleted(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
+//QuestAssigned
+export function handleQuestUserAdded(event: QuestUserAddedEvent): void {
+  let quest = Quest.load(event.params.id.toString());
+  if (quest) {
+    quest.interestedUsers = event.params.interestedUserAddresses;
+    quest.save();
+  }
+}
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+export function handleQuestAssigned(event: QuestAssignedEvent): void {
+  let quest = Quest.load(event.params.id.toString());
+  if (quest) {
+    quest.assigned = event.params.interestedUser;
+    quest.save();
+  }
+}
 
-  entity.save()
+export function handleQuestCompleted(event: QuestCompletedEvent): void {
+  let quest = Quest.load(event.params.id.toString());
+  if (quest) {
+    quest.status = event.params.questStatus;
+    quest.save();
+
+    let creator = Creator.load(event.params.assignerAddress);
+    if (creator) {
+      creator.creator = event.params.assignerAddress;
+      creator.totalXP = event.params.creatorXP;
+      creator.isVerified = false;
+      creator.save();
+    } else {
+      let creator = new Creator(event.params.assignerAddress);
+
+      creator.id = event.params.assignerAddress;
+      creator.creator = event.params.assignerAddress;
+      creator.totalXP = event.params.creatorXP;
+      creator.isVerified = false;
+      creator.metadata = "undefined";
+      creator.save();
+    }
+  }
+}
+
+export function handleQuestDeleted(event: QuestDeletedEvent): void {
+  let quest = Quest.load(event.params.id.toString());
+  if (quest) {
+    quest.id = "0";
+    quest.metadata = "0";
+    quest.save();
+  }
+}
+
+export function handleCampaignCreated(event: CampaignCreatedEvent): void {
+  let campaign = new Campaign(event.params.id.toString());
+
+  campaign.id = event.params.id;
+  campaign.creator = event.params.creator;
+  campaign.metadata = event.params.metadata;
+  campaign.totalAmount = event.params.totalAmount;
+  campaign.donatedAmount = event.params.donatedAmount;
+  campaign.totalDonors = event.params.totalDonors;
+  campaign.status = event.params.status;
+  campaign.xp = event.params.xp;
+
+  campaign.save();
+}
+
+export function handleDonateToCampaign(event: DonateToCampaignEvent): void {
+  let campaign = Campaign.load(event.params.id.toString());
+  if (campaign) {
+    campaign.donatedAmount = event.params.totalDonatedAmount;
+    campaign.totalDonors = event.params.totalDonors;
+    campaign.save();
+
+    let donor = new Donor(event.params.id.toString());
+    donor.id = event.params.id;
+    donor.amount = event.params.donorAmount;
+    donor.donor = event.params.donorAddress;
+    donor.save();
+
+    let creator = Creator.load(event.params.donorAddress);
+    if (creator) {
+      creator.creator = event.params.donorAddress;
+      creator.totalXP = event.params.donorXP;
+      creator.isVerified = false;
+      creator.save();
+    } else {
+      let creator = new Creator(event.params.donorAddress);
+
+      creator.id = event.params.donorAddress;
+      creator.creator = event.params.donorAddress;
+      creator.totalXP = event.params.donorXP;
+      creator.isVerified = false;
+      creator.metadata = "undefined";
+      creator.save();
+    }
+  }
 }
 
 export function handleCampaignStatusChanged(
   event: CampaignStatusChangedEvent
 ): void {
-  let entity = new CampaignStatusChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-  entity.status = event.params.status
+  let campaign = Campaign.load(event.params.id.toString());
+  if (campaign) {
+    campaign.status = event.params.status;
+    campaign.save();
+  }
+}
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+export function handleCampaignDeleted(event: CampaignDeletedEvent): void {
+  let campaign = Campaign.load(event.params.id.toString());
+  if (campaign) {
+    campaign.id = "0";
+    campaign.metadata = "0";
+    campaign.save();
+  }
 }
 
 export function handleCreatorMetadataChanged(
   event: CreatorMetadataChangedEvent
 ): void {
-  let entity = new CreatorMetadataChanged(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.creator = event.params.creator
-  entity.metadata = event.params.metadata
+  let creator = Creator.load(event.params.creator);
+  if (creator) {
+    creator.creator = event.params.creator;
+    creator.metadata = event.params.metadata;
+    creator.save();
+  } else {
+    let creator = new Creator(event.params.creator);
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+    creator.creator = event.params.creator;
+    creator.metadata = event.params.metadata;
+    creator.save();
+  }
 }
 
 export function handleCreatorVerified(event: CreatorVerifiedEvent): void {
-  let entity = new CreatorVerified(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.creator = event.params.creator
-  entity.isVerified = event.params.isVerified
+  let creator = Creator.load(event.params.creator);
+  if (creator) {
+    creator.creator = event.params.creator;
+    creator.isVerified = event.params.isVerified;
+    creator.save();
+  } else {
+    let creator = new Creator(event.params.creator);
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleDonateToCampaign(event: DonateToCampaignEvent): void {
-  let entity = new DonateToCampaign(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-  entity.totalDonatedAmount = event.params.totalDonatedAmount
-  entity.donorAddress = event.params.donorAddress
-  entity.donorXP = event.params.donorXP
-  entity.donorAmount = event.params.donorAmount
-  entity.totalDonors = event.params.totalDonors
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+    creator.creator = event.params.creator;
+    creator.isVerified = event.params.isVerified;
+    creator.save();
+  }
 }
 
 export function handleOwnershipTransferred(
   event: OwnershipTransferredEvent
-): void {
-  let entity = new OwnershipTransferred(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.previousOwner = event.params.previousOwner
-  entity.newOwner = event.params.newOwner
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleQuestAssigned(event: QuestAssignedEvent): void {
-  let entity = new QuestAssigned(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-  entity.interestedUser = event.params.interestedUser
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleQuestCompleted(event: QuestCompletedEvent): void {
-  let entity = new QuestCompleted(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-  entity.assignerAddress = event.params.assignerAddress
-  entity.questStatus = event.params.questStatus
-  entity.creatorXP = event.params.creatorXP
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleQuestCreated(event: QuestCreatedEvent): void {
-  let entity = new QuestCreated(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-  entity.creator = event.params.creator
-  entity.metadata = event.params.metadata
-  entity.amount = event.params.amount
-  entity.status = event.params.status
-  entity.xp = event.params.xp
-  entity.assigned = event.params.assigned
-  entity.interestedUsers = event.params.interestedUsers
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleQuestDeleted(event: QuestDeletedEvent): void {
-  let entity = new QuestDeleted(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleQuestUserAdded(event: QuestUserAddedEvent): void {
-  let entity = new QuestUserAdded(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.space__id = event.params.id
-  entity.interestedUserAddresses = event.params.interestedUserAddresses
-  entity.userComment = event.params.userComment
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
+): void {}

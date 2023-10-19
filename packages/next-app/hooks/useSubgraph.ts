@@ -1,65 +1,67 @@
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { gql } from "urql";
 
 const useSubgraph = () => {
-  const client = new ApolloClient({
-    uri: "https://api.thegraph.com/subgraphs/name/lakshh07/space",
-    cache: new InMemoryCache(),
-  });
-
-  const questQuery = {
-    query: gql`
-      query {
-        quests(first: 5) {
-          id
-          creator
-          metadata
-          amount
-          status
-          xp
-          assigned
-          interestedUsers
-        }
+  const questQuery = gql`
+    query {
+      quests(first: 20) {
+        id
+        creator
+        metadata
+        amount
+        status
+        xp
+        assigned
+        interestedUsers
       }
-    `,
-  };
+    }
+  `;
 
-  const campaignQuery = {
-    query: gql`
-      query {
-        campaigns {
-          id
-          creator
-          metadata
-          totalAmount
-          donatedAmount
-          totalDonors
-          status
-          xp
-        }
+  const campaignQuery = gql`
+    query {
+      campaigns(first: 20) {
+        id
+        creator
+        metadata
+        totalAmount
+        donatedAmount
+        totalDonors
+        status
+        xp
       }
-    `,
-  };
+    }
+  `;
 
-  const creatorQuery = (address: string) => {
-    return {
-      query: gql`
-        query {
-          creators(where: { creator: ${address} }) {
-            creator
-            isVerified
-            metadata
-            totalXP
-          }
-        }
-      `,
-    };
-  };
+  const campaignQueryById = gql`
+    query($id: String) {
+      campaigns(id: $id) {
+        id
+        creator
+        metadata
+        totalAmount
+        donatedAmount
+        totalDonors
+        status
+        xp
+      }
+    }
+  `;
+
+  const creatorQueryById = gql`
+    query($creator: String) {
+      creators(creator: $creator) {
+        creator
+        isVerified
+        metadata
+        totalXP
+      }
+    }
+  `;
 
   return {
-    client,
     questQuery,
     campaignQuery,
-    creatorQuery,
+    campaignQueryById,
+    creatorQueryById,
   };
 };
 

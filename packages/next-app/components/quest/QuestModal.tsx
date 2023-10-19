@@ -15,13 +15,17 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { MetadataType } from "../Card";
 import { ethers } from "ethers";
-import useAccountAbstraction, { contract } from "@/hooks/useAccountAbstraction";
+import useAccountAbstraction, {
+  contract,
+  signerContract,
+} from "@/hooks/useAccountAbstraction";
 import { useSmartAccountContext } from "@/context/userAccount";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
+import { ethersProvider } from "@/utils/rainbowConfig";
 
 interface QuestModalProps {
   id: number;
@@ -47,20 +51,14 @@ export const QuestModal: React.FC<QuestModalProps> = ({
   const [disabled, setDisabled] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
-  const [completeQuestTxnData, setCompleteQuestTxnData] = useState<any>({
-    id: "",
-    hash: "",
-    isSuccess: false,
-  });
-  const [owner, setOwner] = useState(false);
 
   const { smartAccount } = useSmartAccountContext();
   const { address } = useAccount();
 
   const createComment = async () => {
-    if (address && interestedUserArray) {
-      interestedUserArray.push(address);
-      const interestedUserArrayString = interestedUserArray.toString();
+    if (address) {
+      interestedUserArray?.push(address);
+      const interestedUserArrayString = interestedUserArray?.toString();
 
       const transaction = await contract.populateTransaction.addQuestUser(
         id,
@@ -75,16 +73,17 @@ export const QuestModal: React.FC<QuestModalProps> = ({
         transactionData: transaction,
         smartAccount: smartAccount,
       });
+
+      setComment("");
     }
   };
 
   const approveInterestedUser = async (userAddress: string) => {
     if (address) {
-      const transaction =
-        await contract.populateTransaction.approveQuestInterestedUser(
-          id,
-          userAddress
-        );
+      const transaction = await contract.populateTransaction.approveQuestInterestedUser(
+        id,
+        userAddress
+      );
 
       await useAccountAbstraction({
         setDisabled: setDisabled,
@@ -100,37 +99,24 @@ export const QuestModal: React.FC<QuestModalProps> = ({
     setLoading(true);
     setDisabled(true);
 
-    const transaction = await contract.questComplete(id, {
+    const transaction = await signerContract.questComplete(id, {
       value: questAmount,
     });
 
-    setCompleteQuestTxnData({
-      id: toastId,
-      hash: transaction?.hash,
-      isSuccess: false,
-    });
+    ethersProvider
+      .waitForTransaction(transaction?.hash)
+      .then((receipt) => {
+        console.log(receipt);
+        if (receipt.status == 1) {
+          setLoading(false);
+          setDisabled(false);
+          toast.success("Transaction Successfull", { id: toastId });
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
   };
-
-  useEffect(() => {
-    if (completeQuestTxnData.isSuccess) {
-      setLoading(false);
-      setDisabled(false);
-      toast.success("Transaction Successfull", {
-        id: completeQuestTxnData?.id,
-      });
-    }
-
-    if (completeQuestTxnData.hash) {
-      const { isSuccess } = useWaitForTransaction({
-        hash: completeQuestTxnData?.hash,
-      });
-
-      setCompleteQuestTxnData({
-        ...completeQuestTxnData,
-        isSuccess: isSuccess,
-      });
-    }
-  }, [completeQuestTxnData.hash, completeQuestTxnData.isSuccess]);
 
   return (
     <Modal
@@ -150,7 +136,11 @@ export const QuestModal: React.FC<QuestModalProps> = ({
           <ModalBody>
             <Box>
               <Flex alignItems={"center"} justifyContent={"space-between"}>
-                <Heading fontSize={"22px"} fontWeight={600}>
+                <Heading
+                  fontSize={"22px"}
+                  fontWeight={600}
+                  textTransform={"capitalize"}
+                >
                   {metadata?.title}
                 </Heading>
 
@@ -202,46 +192,53 @@ export const QuestModal: React.FC<QuestModalProps> = ({
               </Text>
               <Text>{metadata?.details}</Text>
 
-              <Text mt={"1em"} fontWeight={600} fontSize={"17px"}>
-                Interested Users:
-              </Text>
-              {interestedUserArray?.map((userAddress, index) => {
-                return (
-                  <Flex
-                    mb={"1em"}
-                    alignItems={"flex-start"}
-                    justifyContent={"space-between"}
-                    w={"70%"}
-                    key={index}
-                  >
-                    <Box>
-                      <Text fontSize={"14px"} color={"blackAlpha.700"}>
-                        {userAddress}
-                      </Text>
-                      <Text>i will do</Text>
-                    </Box>
-
-                    {owner && (
-                      <Button
-                        colorScheme="purple"
-                        rounded={"15px"}
-                        size={"xs"}
-                        variant={"outline"}
-                        isLoading={loading}
-                        onClick={() => approveInterestedUser(userAddress)}
+              {interestedUserArray && interestedUserArray[0]?.length && (
+                <>
+                  <Text mt={"1em"} fontWeight={600} fontSize={"17px"}>
+                    Interested Users:
+                  </Text>
+                  {interestedUserArray?.map((userAddress, index) => {
+                    return (
+                      <Flex
+                        mb={"1em"}
+                        alignItems={"flex-start"}
+                        justifyContent={"space-between"}
+                        w={"70%"}
+                        key={index}
                       >
-                        Approve
-                      </Button>
-                    )}
-                  </Flex>
-                );
-              })}
+                        <Box>
+                          <Text fontSize={"14px"} color={"blackAlpha.700"}>
+                            {userAddress}
+                          </Text>
+                          {/* <Text>i will do</Text> */}
+                        </Box>
 
+                        {assignedUser ===
+                          "0x0000000000000000000000000000000000000000" &&
+                          address?.toUpperCase() === creator.toUpperCase() && (
+                            <Button
+                              colorScheme="purple"
+                              rounded={"15px"}
+                              size={"xs"}
+                              variant={"outline"}
+                              isLoading={loading}
+                              onClick={() => approveInterestedUser(userAddress)}
+                            >
+                              Approve
+                            </Button>
+                          )}
+                      </Flex>
+                    );
+                  })}
+                </>
+              )}
               <Text mt={"1em"} fontWeight={600} fontSize={"17px"}>
                 Assigned:
               </Text>
               <Text fontSize={"14px"} color={"blackAlpha.700"}>
-                {assignedUser ? assignedUser : "None"}
+                {assignedUser === "0x0000000000000000000000000000000000000000"
+                  ? "None"
+                  : assignedUser}
               </Text>
             </Box>
           </ModalBody>
@@ -260,25 +257,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
             >
               Quest Completed
             </Button>
-          ) : assignedUser ? (
-            <Button
-              rounded={"15px"}
-              colorScheme="purple"
-              variant={"outline"}
-              pointerEvents={"none"}
-            >
-              User Assigned
-            </Button>
-          ) : owner ? (
-            <Button
-              rounded={"15px"}
-              colorScheme="purple"
-              isLoading={loading}
-              onClick={() => metadata && completeQuest(metadata?.amount)}
-            >
-              Close Quest
-            </Button>
-          ) : (
+          ) : assignedUser === "0x0000000000000000000000000000000000000000" ? (
             <>
               <Input
                 placeholder="add comment.."
@@ -288,6 +267,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
                 name={"comment"}
                 value={comment}
                 isDisabled={disabled}
+                autoComplete="off"
                 onChange={(e) => setComment(e.target.value)}
               />
               <Button
@@ -300,6 +280,27 @@ export const QuestModal: React.FC<QuestModalProps> = ({
                 Want to do?
               </Button>
             </>
+          ) : (
+            <Button
+              rounded={"15px"}
+              colorScheme="purple"
+              variant={"outline"}
+              pointerEvents={"none"}
+            >
+              User Assigned
+            </Button>
+          )}
+
+          {address?.toUpperCase() === creator.toUpperCase() && (
+            <Button
+              ml={"1rem"}
+              rounded={"15px"}
+              colorScheme="purple"
+              isLoading={loading}
+              onClick={() => metadata && completeQuest(metadata?.amount)}
+            >
+              Close Quest
+            </Button>
           )}
         </ModalFooter>
       </ModalContent>

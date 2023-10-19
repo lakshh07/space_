@@ -66,7 +66,7 @@ export const Card: React.FC<CardProps> = ({
     getMetadata();
   }, []);
 
-  const interestedUserArray: string[] | undefined = interestedUser?.split(",");
+  const interestedUserArray: string[] = interestedUser?.split(",") || [];
 
   return (
     <Flex
@@ -108,7 +108,12 @@ export const Card: React.FC<CardProps> = ({
       >
         <Box w={"100%"}>
           {data ? (
-            <Heading fontSize={"26px"} fontWeight={600} color={"black"}>
+            <Heading
+              fontSize={"26px"}
+              fontWeight={600}
+              color={"black"}
+              textTransform={"capitalize"}
+            >
               {data?.title}
             </Heading>
           ) : (

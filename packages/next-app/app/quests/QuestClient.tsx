@@ -3,7 +3,7 @@
 import { Card } from "@/components/Card";
 import { fieldDataType } from "@/components/CreateModal";
 import { Header } from "@/components/Header";
-import { Container } from "@chakra-ui/react";
+import { Container, Flex, Spinner } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import useAccountAbstraction, { contract } from "@/hooks/useAccountAbstraction";
@@ -13,7 +13,8 @@ import { addToIPFS } from "@/hooks/useWeb3StorageClient";
 import toast from "react-hot-toast";
 import { ethers } from "ethers";
 import { useLoadingContext } from "@/context/loading";
-import axios from "axios";
+import { useQuery } from "urql";
+import useSubgraph from "@/hooks/useSubgraph";
 
 export type questDataType = {
   id: string;
@@ -23,7 +24,7 @@ export type questDataType = {
   status: boolean;
   xp: number;
   assigned: string;
-  interestedUser: string;
+  interestedUsers: string;
 };
 
 export const QuestClient: React.FC = () => {
@@ -40,18 +41,13 @@ export const QuestClient: React.FC = () => {
   const { smartAccount } = useSmartAccountContext();
   const { address } = useAccount();
   const { setMainLoading } = useLoadingContext();
-  const [data, setData] = useState<questDataType[]>([]);
+  const { questQuery } = useSubgraph();
 
-  const getData = async () => {
-    await axios.get("/api/quests").then((res) => {
-      setData(res?.data?.quests);
-    });
-  };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
+  const [result, reexecuteQuery] = useQuery({
+    query: questQuery,
+  });
+  const { data, fetching } = result;
+  // reexecuteQuery({ requestPolicy: "network-only" })
   useEffect(() => {
     setMainLoading(false);
   }, [data]);
@@ -102,7 +98,7 @@ export const QuestClient: React.FC = () => {
     <Container my={"4rem"} maxW={"1200px"}>
       <Header
         title="Quests"
-        length={data?.length || 0}
+        length={data?.quests?.length || 0}
         actionLabel="New Quest"
         isCampaign={false}
         isLoading={loading}
@@ -112,20 +108,26 @@ export const QuestClient: React.FC = () => {
         setFormData={setQuestData}
       />
 
-      {data?.map((list, index) => {
-        return (
-          <Card
-            key={index}
-            index={index}
-            creator={list.creator}
-            amount={list.amount}
-            status={list.status}
-            interestedUser={list.interestedUser}
-            assignedUser={list.assigned}
-            metadata={list.metadata}
-          />
-        );
-      })}
+      {fetching ? (
+        <Flex justifyContent={"center"} mt={"10em"}>
+          <Spinner />
+        </Flex>
+      ) : (
+        data?.quests?.map((list: questDataType, index: number) => {
+          return (
+            <Card
+              key={index}
+              index={index}
+              creator={list.creator}
+              amount={list.amount}
+              status={list.status}
+              interestedUser={list.interestedUsers}
+              assignedUser={list.assigned}
+              metadata={list.metadata}
+            />
+          );
+        })
+      )}
     </Container>
   );
 };
