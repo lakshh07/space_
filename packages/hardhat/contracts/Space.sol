@@ -349,15 +349,17 @@ contract Space_ is Ownable, ReentrancyGuard {
     }
 
     function deleteQuest(uint256 _id) external nonReentrant {
+        string memory id = idToQuest[_id].id;
         delete idToQuest[_id];
 
-        emit QuestDeleted(idToQuest[_id].id);
+        emit QuestDeleted(id);
     }
 
     function deleteCamapign(uint256 _id) external nonReentrant {
+        string memory id = idToCampaign[_id].id;
         delete idToCampaign[_id];
 
-        emit CampaignDeleted(idToCampaign[_id].id);
+        emit CampaignDeleted(id);
     }
 
     function changeProfileMetadata(

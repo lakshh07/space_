@@ -1,28 +1,34 @@
 specVersion: 0.0.5
-features:
-  - fullTextSearch
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Space_
+    name: space_
     network: mumbai
     source:
-      address: "0x243a6fc4FbA9B7a6f3aD7AB554f4E8943Ef521CA"
-      abi: Space_
-      startBlock: 41339406
+      address: "0x67A94C43b74562aa461e3cf0ED91CfF66427312D"
+      abi: space_
+      startBlock: 41377632
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Quest
-        - Campaign
-        - Creator
-        - Donor
+        - CampaignCreated
+        - CampaignDeleted
+        - CampaignStatusChanged
+        - CreatorMetadataChanged
+        - CreatorVerified
+        - DonateToCampaign
+        - OwnershipTransferred
+        - QuestAssigned
+        - QuestCompleted
+        - QuestCreated
+        - QuestDeleted
+        - QuestUserAdded
       abis:
-        - name: Space_
-          file: ./abis/Space_.json
+        - name: space_
+          file: ./abis/space_.json
       eventHandlers:
         - event: CampaignCreated(string,address,string,uint256,uint256,uint256,bool,uint256)
           handler: handleCampaignCreated

@@ -16,11 +16,23 @@ import { ethers } from "ethers";
 import { Range } from "react-date-range";
 import { Card } from "@/components/Card";
 import { useLoadingContext } from "@/context/loading";
+import axios from "axios";
 
 const initialDateRange = {
   startDate: new Date(),
   endDate: new Date(),
   key: "selection",
+};
+
+export type campaignDataType = {
+  id: string;
+  creator: string;
+  metadata: string;
+  amount: number;
+  donatedAmount: number;
+  totalDonors: number;
+  status: boolean;
+  xp: number;
 };
 
 export const CampaignsClient: React.FC = () => {
@@ -38,6 +50,21 @@ export const CampaignsClient: React.FC = () => {
   const { smartAccount } = useSmartAccountContext();
   const { address } = useAccount();
   const { setMainLoading } = useLoadingContext();
+  const [data, setData] = useState<campaignDataType[]>([]);
+
+  const getData = async () => {
+    await axios.get("/api/quests").then((res) => {
+      setData(res?.data?.quests);
+    });
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  useEffect(() => {
+    setMainLoading(false);
+  }, [data]);
 
   const create = async () => {
     setLoading(true);
@@ -60,7 +87,7 @@ export const CampaignsClient: React.FC = () => {
 
     console.log(cid, "IPFS CID");
 
-    const transaction = await contract.populateTransaction.createQuest(
+    const transaction = await contract.populateTransaction.createCampaign(
       uuidv4(),
       cid.toString(),
       address,
@@ -74,40 +101,22 @@ export const CampaignsClient: React.FC = () => {
       transactionData: transaction,
       smartAccount: smartAccount,
     });
+
+    setCampaignData({
+      title: "",
+      description: "",
+      duration: "",
+      details: "",
+      amount: 0,
+      xp: 0,
+    });
   };
-
-  const sampleData = [
-    {
-      id: "adcadc-sc-s-a-cacdcd-ad",
-      creator: "0xc632F549D5107C32B9FF47937DAB11008b1e2636",
-      metadata: "bafybeicpc5f32gkmc6f4c6i4i6nqykpbbj7vr3qgbxyaalkhcf6p57bika",
-      amount: 700000000000000,
-      donatedAmount: 3000000000000,
-      totalDonors: 12,
-      status: false,
-      xp: 5,
-    },
-    // {
-    //   id: "adcadc-sc-s-a-cac-ad",
-    //   creator: "0xc632F549D5107C32B9FF47937DAB11008b1e2636",
-    //   metadata: "bafybeih5speevxm53vegwwcgz37azvsiry5upufesy6sz34oabte3a4icm",
-    //   amount: 700000000000000,
-    //   donatedAmount: 3000000000000,
-    //   totalDonors: 12,
-    //   status: false,
-    //   xp: 5,
-    // },
-  ];
-
-  useEffect(() => {
-    setMainLoading(false);
-  }, [sampleData]);
 
   return (
     <Container my={"4rem"} maxW={"1200px"}>
       <Header
         title="Campaigns"
-        length={sampleData.length}
+        length={data?.length || 0}
         actionLabel="New Camapign"
         isCampaign={true}
         isLoading={loading}
@@ -119,7 +128,7 @@ export const CampaignsClient: React.FC = () => {
         onChangeDate={(value) => setDateRange(value)}
       />
 
-      {sampleData.map((list, index) => {
+      {data?.map((list, index) => {
         return (
           <Card
             key={index}

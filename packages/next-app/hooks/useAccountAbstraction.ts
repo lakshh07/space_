@@ -1,4 +1,4 @@
-import { ethersProvider } from "@/utils/rainbowConfig";
+import { ethersProvider, ethersSigner } from "@/utils/rainbowConfig";
 import { ethers } from "ethers";
 import spaceAbi from "@/contracts/ABI/Space.json";
 import {
@@ -20,7 +20,7 @@ type useAccountAbstractionProps = {
 export const contract = new ethers.Contract(
   spaceContractAddress,
   spaceAbi,
-  ethersProvider
+  ethersSigner
 );
 
 const useAccountAbstraction = async ({
@@ -45,8 +45,9 @@ const useAccountAbstraction = async ({
     let userOp = await smartAccount?.buildUserOp([tx1]);
     console.log({ userOp });
 
-    const biconomyPaymaster =
-      smartAccount?.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+    const biconomyPaymaster = smartAccount?.paymaster as IHybridPaymaster<
+      SponsorUserOperationDto
+    >;
     let paymasterServiceData: SponsorUserOperationDto = {
       mode: PaymasterMode.SPONSORED,
       smartAccountInfo: {
@@ -60,11 +61,10 @@ const useAccountAbstraction = async ({
         id: toastId,
       });
 
-      const paymasterAndDataResponse =
-        await biconomyPaymaster.getPaymasterAndData(
-          userOp,
-          paymasterServiceData
-        );
+      const paymasterAndDataResponse = await biconomyPaymaster.getPaymasterAndData(
+        userOp,
+        paymasterServiceData
+      );
 
       userOp.paymasterAndData = paymasterAndDataResponse.paymasterAndData;
       const userOpResponse = await smartAccount?.sendUserOp(userOp);
@@ -89,7 +89,7 @@ const useAccountAbstraction = async ({
         console.log("txHash", receipt.transactionHash);
       }
     }
-  } catch (err: any) {
+  } catch (err) {
     console.error(err);
     toast.error(err, {
       id: toastId,

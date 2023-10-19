@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.6",
     "@biconomy/account": "^3.1.0",
     "@biconomy/bundler": "^3.1.0",
     "@biconomy/common": "^3.1.0",

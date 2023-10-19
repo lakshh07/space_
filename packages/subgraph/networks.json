@@ -1,8 +1,8 @@
 {
   "mumbai": {
-    "Space_": {
-      "address": "0x243a6fc4FbA9B7a6f3aD7AB554f4E8943Ef521CA",
-      "startBlock": 41339406
+    "space_": {
+      "address": "0x67A94C43b74562aa461e3cf0ED91CfF66427312D",
+      "startBlock": 41377632
     }
   }
 }

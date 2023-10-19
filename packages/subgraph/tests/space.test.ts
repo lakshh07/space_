@@ -8,7 +8,7 @@ import {
 } from "matchstick-as/assembly/index"
 import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { CampaignCreated } from "../generated/schema"
-import { CampaignCreated as CampaignCreatedEvent } from "../generated/Space_/Space_"
+import { CampaignCreated as CampaignCreatedEvent } from "../generated/space_/space_"
 import { handleCampaignCreated } from "../src/space"
 import { createCampaignCreatedEvent } from "./space-utils"
 

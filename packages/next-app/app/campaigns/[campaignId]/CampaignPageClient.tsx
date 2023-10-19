@@ -86,7 +86,9 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
     setLoading(true);
     setDisabled(true);
 
-    const transaction = await contract.questComplete();
+    const transaction = await contract.donateToCampaign(1, {
+      value: ethers.utils.parseEther("0.01"),
+    });
 
     setCompleteQuestTxnData({
       id: toastId,
@@ -206,9 +208,13 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
                 justifyContent={"center"}
               >
                 <Text fontSize={"26px"}>
-                  {moment(data?.startDate).toNow(true).substring(0, 2) == "an"
+                  {moment(data?.startDate)
+                    .toNow(true)
+                    .substring(0, 2) == "an"
                     ? "0"
-                    : moment(data?.endDate).toNow(true).substring(0, 2)}
+                    : moment(data?.endDate)
+                        .toNow(true)
+                        .substring(0, 2)}
                 </Text>
                 <Text
                   fontSize={"28px"}
@@ -216,7 +222,9 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
                   mt={"-7px"}
                   textTransform={"capitalize"}
                 >
-                  {moment(data?.endDate).toNow().substring(2)}
+                  {moment(data?.endDate)
+                    .toNow()
+                    .substring(2)}
                 </Text>
               </Flex>
             </Flex>

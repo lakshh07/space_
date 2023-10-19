@@ -13,7 +13,7 @@ import {
   QuestCreated,
   QuestDeleted,
   QuestUserAdded
-} from "../generated/Space_/Space_"
+} from "../generated/space_/space_"
 
 export function createCampaignCreatedEvent(
   id: string,

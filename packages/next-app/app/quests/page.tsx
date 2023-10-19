@@ -1,6 +1,6 @@
 import React from "react";
 import { QuestClient } from "./QuestClient";
 
-export default function DashboardPage() {
+export default function QuestsPage() {
   return <QuestClient />;
 }

@@ -24,6 +24,8 @@ export const ethersProvider = new ethers.providers.Web3Provider(
   "any"
 );
 
+export const ethersSigner = ethersProvider.getSigner();
+
 export const { chains, publicClient } = configureChains(
   [polygonMumbai],
   [publicProvider()]

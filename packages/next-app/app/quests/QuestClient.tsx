@@ -13,6 +13,7 @@ import { addToIPFS } from "@/hooks/useWeb3StorageClient";
 import toast from "react-hot-toast";
 import { ethers } from "ethers";
 import { useLoadingContext } from "@/context/loading";
+import axios from "axios";
 
 export type questDataType = {
   id: string;
@@ -22,6 +23,7 @@ export type questDataType = {
   status: boolean;
   xp: number;
   assigned: string;
+  interestedUser: string;
 };
 
 export const QuestClient: React.FC = () => {
@@ -38,35 +40,21 @@ export const QuestClient: React.FC = () => {
   const { smartAccount } = useSmartAccountContext();
   const { address } = useAccount();
   const { setMainLoading } = useLoadingContext();
-  // https://bafybeicz6whpwp2yd2tdu3e5vvu2k5ljujdlwuhxl5dowil4tooiwme4ba.ipfs.w3s.link/space_questData.json
+  const [data, setData] = useState<questDataType[]>([]);
 
-  const sampleData = [
-    {
-      id: "dchbuwd6cgwyidgc8w",
-      creator: "0xc632F549D5107C32B9FF47937DAB11008b1e2636",
-      metadata: "bafybeieh5dr4korj32zbv3faitmyp4eucmq2snw5yasns5ujulro5yioei",
-      amount: 2000000000000000,
-      status: false,
-      xp: 10,
-      interestedUser:
-        "0x1632F549D5107C32B9FF47937DAB11008b1e2636,0x987F549D5107C32B9FF47937DAB11008b1e2636,0x6532F549D5107C32B9FF47937DAB11008b1e2636",
-      assigned: "",
-    },
-    {
-      id: "dchbuwd6cgwyidgc8w",
-      creator: "0xc632F549D5107C32B9FF47937DAB11008b1e2636",
-      metadata: "bafybeiapcbhqiglgyt2rk6il5n5tztrf7mofni43dqhil6g77wqtwmjh6e",
-      amount: 2000000000000000,
-      status: false,
-      xp: 10,
-      interestedUser: "0x1632F549D5107C32B9FF47937DAB11008b1e2636",
-      assigned: "0x3632F549D5107C32B9FF47937DAB11008b1e2636",
-    },
-  ];
+  const getData = async () => {
+    await axios.get("/api/quests").then((res) => {
+      setData(res?.data?.quests);
+    });
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   useEffect(() => {
     setMainLoading(false);
-  }, [sampleData]);
+  }, [data]);
 
   const create = async () => {
     setLoading(true);
@@ -114,7 +102,7 @@ export const QuestClient: React.FC = () => {
     <Container my={"4rem"} maxW={"1200px"}>
       <Header
         title="Quests"
-        length={2}
+        length={data?.length || 0}
         actionLabel="New Quest"
         isCampaign={false}
         isLoading={loading}
@@ -124,7 +112,7 @@ export const QuestClient: React.FC = () => {
         setFormData={setQuestData}
       />
 
-      {sampleData.map((list, index) => {
+      {data?.map((list, index) => {
         return (
           <Card
             key={index}
