@@ -46,9 +46,8 @@ export const HomePage: React.FC = () => {
               for <span style={{ color: "#F87AC3" }}>Creators.</span>
             </Heading>
             <Text w={"60%"} fontWeight={500} my={"0.5em"} fontSize={"17px"}>
-              A decentralized and transparent community where creative
-              individuals can connect and collaborate to advance their business
-              growth.
+              A social platform to seamlessly introduce Web2 users to Web3,
+              without the complexities of crypto for quests or donations.
             </Text>
             <Button
               bg={"#7263D6"}

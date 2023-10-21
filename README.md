@@ -1,74 +1,17 @@
-# 🦄 Web3 Starter Kit
+# ✨ Space_
 
-A quick starter to build on Ethereum and Polygon! 💜
->Stack used Next.js, Chakra-UI, Hardhat, Rainbow Wallet, Wagmi 🚀
-
-<br/>
-
-![image](https://bafybeifacspez7tdlba5auczy5qqpqg3mhyakhorp4jvjesyeiaxn33gwm.ipfs.dweb.link/cover.png)
+A social platform seamlessly introduces Web2 users to Web3, without the complexities of crypto for quests or donations.
+>Stack used Next.js, TypeScript, Biconomy Gasless SDK, PolygonID, IPFS, The Graph,  Chakra-UI, Hardhat, Rainbow Wallet, Wagmi 🚀
 
 <br/>
 
+![image](https://i.ibb.co/DKN8HTZ/Screenshot-2023-10-22-at-1-23-06-AM.png)
 
-# 🏄‍♂️ Quick Start
 
-Prerequisites: [Node (v16 LTS)](https://nodejs.org/en/download/) plus [Yarn](https://classic.yarnpkg.com/en/docs/install/) and [Git](https://git-scm.com/downloads)
-
-> clone/fork 🦄 web3-starter-kit:
-
-```bash
-git clone https://github.com/lakshh07/Web3-Starter-Kit.git
-```
-
-> install your 👷‍ dependencies:
-
-```bash
-cd web3-starter-kit
-yarn install
-```
-
-> in a second terminal window, start your 📱 frontend:
-
-```bash
-cd web3-starter-kit
-yarn dev
-```
->Contract are deployed on Polygon Mumbai
-
-<br/>
-
-<hr/>
- 
- >📣  Checkout branches for `React.js` and `Typescript`
-
-<hr/>
-
-<br/>
-
-🔏 Edit your smart contract `Greeter.sol` in `packages/hardhat/contracts`
-
-📝 Edit your frontend `index.js` in `packages/next-app/pages/`
-
-💼 Edit your deployment scripts `deploy.js` in `packages/hardhat/scripts`
-
-📱 Open http://localhost:3000 to see the app
-
-🌍 You need an RPC key for testnets and production deployments, create an [Alchemy](https://www.alchemy.com/) account and replace the value of `ALCHEMY_KEY = xxx` in `packages/hardhat/.env` with your new key.
-
-<br/>
-
-# 📚 Learn More
-
-Solidity: https://docs.soliditylang.org/en/v0.8.14/
-<br/>
-Next.js: https://nextjs.org/docs
-<br/>
-ChakraUI: https://chakra-ui.com/docs/components/overview
-<br/>
-Hardhat: https://hardhat.org/getting-started/
-<br/>
-Rainbow Kit: https://www.rainbowkit.com/docs/introduction <br/>
-Wagmi: https://wagmi.sh/docs/getting-started
-<br/>
-Ether.js: https://docs.ethers.io/v5/
-
+### 🔗 Links
+- [Space_ PolygonId VC Verifier Server](https://github.com/lakshh07/space-vc-server)
+- [Space_ PolygonId Credentials Issue](https://issuer-ui.polygonid.me/credentials/scan-link/2a3bc413-5f08-4a30-8e06-ad518c76ba57)
+- [The Graph Protocol](https://api.studio.thegraph.com/query/55782/space/v0.0.4)
+- [Biconomy Gasless SDKs Code](https://github.com/lakshh07/space_/blob/main/packages/next-app/hooks/useAccountAbstraction.ts)
+- [Web3.Storage Code](https://github.com/lakshh07/space_/blob/main/packages/next-app/hooks/useWeb3StorageClient.ts)
+- [Polygon Mumbai Smart Contract](https://mumbai.polygonscan.com/address/0x67A94C43b74562aa461e3cf0ED91CfF66427312D)

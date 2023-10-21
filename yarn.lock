@@ -1743,9 +1743,9 @@
     fastfile "0.0.20"
     ffjavascript "^0.2.48"
 
-"@iden3/eslint-config@git+https://github.com/iden3/eslint-config.git":
+"@iden3/eslint-config@https://github.com/iden3/eslint-config":
   version "1.0.0"
-  resolved "git+https://github.com/iden3/eslint-config.git#2848a55e4d4fabe196315b4828158856a84292aa"
+  resolved "https://github.com/iden3/eslint-config#2848a55e4d4fabe196315b4828158856a84292aa"
 
 "@iden3/js-crypto@1.0.1":
   version "1.0.1"
