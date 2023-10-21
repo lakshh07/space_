@@ -33,6 +33,8 @@ import { usePathname } from "next/navigation";
 import { ethersProvider } from "@/utils/rainbowConfig";
 import { useQuery } from "urql";
 import useSubgraph from "@/hooks/useSubgraph";
+import { checkSignIn } from "@/utils/checkSignIn";
+import { useAccount } from "wagmi";
 
 interface CampaignPageClientProps {
   campaignId: string;
@@ -67,6 +69,7 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
   const [fundAmount, setFundAmount] = useState<number>(0.0);
   const { setMainLoading } = useLoadingContext();
   const pathname = usePathname();
+  const { address } = useAccount();
 
   const { campaignQueryById } = useSubgraph();
   function onChange(e: any) {
@@ -115,6 +118,9 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
           setDisabled(false);
           setFundAmount(0.0);
           toast.success("Transaction Successfull", { id: toastId });
+          setTimeout(() => {
+            reexecuteQuery({ requestPolicy: "network-only" });
+          }, 3000);
         }
       })
       .catch((error) => {
@@ -325,7 +331,7 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
                     rounded={"15px"}
                     size={"md"}
                     isLoading={loading}
-                    onClick={fundDonation}
+                    onClick={() => checkSignIn(address) && fundDonation()}
                     w={"40%"}
                   >
                     Fund

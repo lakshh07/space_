@@ -4,7 +4,7 @@ import { useLoadingContext } from "@/context/loading";
 import { Box, Flex, Heading, Spinner } from "@chakra-ui/react";
 import React from "react";
 
-export const Loading = () => {
+export const Loading: React.FC = () => {
   const { mainLoading } = useLoadingContext();
   return (
     <>

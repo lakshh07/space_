@@ -6,6 +6,13 @@ const nextConfig = {
     config.externals.push("pino-pretty", "lokijs", "encoding");
     return config;
   },
+  images: {
+    domains: [
+      "res.cloudinary.com",
+      "lh3.googleusercontent.com",
+      "avatars.githubusercontent.com",
+    ],
+  },
 };
 
 module.exports = nextConfig;

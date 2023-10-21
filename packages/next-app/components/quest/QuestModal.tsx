@@ -26,7 +26,10 @@ import { useSmartAccountContext } from "@/context/userAccount";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
 import { ethersProvider } from "@/utils/rainbowConfig";
-
+import { checkSignIn } from "@/utils/checkSignIn";
+import { UseQueryExecute } from "urql";
+import { readContract } from "@wagmi/core";
+import spaceAbi from "@/contracts/ABI/Space.json";
 interface QuestModalProps {
   id: number;
   creator: string;
@@ -36,6 +39,7 @@ interface QuestModalProps {
   interestedUserArray?: string[];
   isOpen: boolean;
   onClose: () => void;
+  reexecuteQuery: UseQueryExecute;
 }
 
 export const QuestModal: React.FC<QuestModalProps> = ({
@@ -47,6 +51,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
   assignedUser,
   isOpen,
   onClose,
+  reexecuteQuery,
 }) => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,6 +59,17 @@ export const QuestModal: React.FC<QuestModalProps> = ({
 
   const { smartAccount } = useSmartAccountContext();
   const { address } = useAccount();
+  const { accountAbstraction } = useAccountAbstraction();
+
+  const getComments = async (address: string) => {
+    const data: any = await readContract({
+      address: "0x67A94C43b74562aa461e3cf0ED91CfF66427312D",
+      abi: spaceAbi,
+      functionName: "fetchInterestedUserComment",
+      args: [id, address],
+    });
+    return data;
+  };
 
   const createComment = async () => {
     if (address) {
@@ -67,7 +83,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
         comment
       );
 
-      await useAccountAbstraction({
+      await accountAbstraction({
         setDisabled: setDisabled,
         setLoading: setLoading,
         transactionData: transaction,
@@ -75,6 +91,10 @@ export const QuestModal: React.FC<QuestModalProps> = ({
       });
 
       setComment("");
+
+      setTimeout(() => {
+        reexecuteQuery({ requestPolicy: "network-only" });
+      }, 3000);
     }
   };
 
@@ -85,12 +105,16 @@ export const QuestModal: React.FC<QuestModalProps> = ({
         userAddress
       );
 
-      await useAccountAbstraction({
+      await accountAbstraction({
         setDisabled: setDisabled,
         setLoading: setLoading,
         transactionData: transaction,
         smartAccount: smartAccount,
       });
+
+      setTimeout(() => {
+        reexecuteQuery({ requestPolicy: "network-only" });
+      }, 3000);
     }
   };
 
@@ -111,6 +135,9 @@ export const QuestModal: React.FC<QuestModalProps> = ({
           setLoading(false);
           setDisabled(false);
           toast.success("Transaction Successfull", { id: toastId });
+          setTimeout(() => {
+            reexecuteQuery({ requestPolicy: "network-only" });
+          }, 3000);
         }
       })
       .catch((error: any) => {
@@ -192,46 +219,56 @@ export const QuestModal: React.FC<QuestModalProps> = ({
               </Text>
               <Text>{metadata?.details}</Text>
 
-              {interestedUserArray && interestedUserArray[0]?.length && (
-                <>
-                  <Text mt={"1em"} fontWeight={600} fontSize={"17px"}>
-                    Interested Users:
-                  </Text>
-                  {interestedUserArray?.map((userAddress, index) => {
-                    return (
-                      <Flex
-                        mb={"1em"}
-                        alignItems={"flex-start"}
-                        justifyContent={"space-between"}
-                        w={"70%"}
-                        key={index}
-                      >
-                        <Box>
-                          <Text fontSize={"14px"} color={"blackAlpha.700"}>
-                            {userAddress}
-                          </Text>
-                          {/* <Text>i will do</Text> */}
-                        </Box>
+              {interestedUserArray &&
+                (interestedUserArray[0]?.length ||
+                  interestedUserArray[1]?.length) && (
+                  <>
+                    <Text mt={"1em"} fontWeight={600} fontSize={"17px"}>
+                      Interested Users:
+                    </Text>
+                    {interestedUserArray
+                      ?.filter((list) => {
+                        return list.length;
+                      })
+                      .map(async (userAddress, index) => {
+                        const cmt: string = await getComments(userAddress);
+                        return (
+                          <Flex
+                            mb={"1em"}
+                            alignItems={"flex-start"}
+                            justifyContent={"space-between"}
+                            w={"70%"}
+                            key={index}
+                          >
+                            <Box>
+                              <Text fontSize={"14px"} color={"blackAlpha.700"}>
+                                {userAddress}
+                              </Text>
+                              <Text>{cmt}</Text>
+                            </Box>
 
-                        {assignedUser ===
-                          "0x0000000000000000000000000000000000000000" &&
-                          address?.toUpperCase() === creator.toUpperCase() && (
-                            <Button
-                              colorScheme="purple"
-                              rounded={"15px"}
-                              size={"xs"}
-                              variant={"outline"}
-                              isLoading={loading}
-                              onClick={() => approveInterestedUser(userAddress)}
-                            >
-                              Approve
-                            </Button>
-                          )}
-                      </Flex>
-                    );
-                  })}
-                </>
-              )}
+                            {assignedUser ===
+                              "0x0000000000000000000000000000000000000000" &&
+                              address?.toUpperCase() ===
+                                creator.toUpperCase() && (
+                                <Button
+                                  colorScheme="purple"
+                                  rounded={"15px"}
+                                  size={"xs"}
+                                  variant={"outline"}
+                                  isLoading={loading}
+                                  onClick={() =>
+                                    approveInterestedUser(userAddress)
+                                  }
+                                >
+                                  Approve
+                                </Button>
+                              )}
+                          </Flex>
+                        );
+                      })}
+                  </>
+                )}
               <Text mt={"1em"} fontWeight={600} fontSize={"17px"}>
                 Assigned:
               </Text>
@@ -275,7 +312,9 @@ export const QuestModal: React.FC<QuestModalProps> = ({
                 colorScheme="purple"
                 isLoading={loading}
                 isDisabled={comment.length ? false : true}
-                onClick={createComment}
+                onClick={() => {
+                  checkSignIn(address) && createComment();
+                }}
               >
                 Want to do?
               </Button>

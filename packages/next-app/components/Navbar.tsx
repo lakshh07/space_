@@ -4,7 +4,7 @@ import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useWalletClient, usePublicClient, useAccount } from "wagmi";
+import { useWalletClient, usePublicClient } from "wagmi";
 import useAAHooks from "@/hooks/useAAHooks";
 import {
   ECDSAOwnershipValidationModule,
@@ -26,16 +26,15 @@ export const Navbar: React.FC = () => {
   const publicClient = usePublicClient();
   const links = ["quests", "campaigns", "profile"];
   const { paymaster, bundler, ChainId } = useAAHooks();
-  const { setSmartAccount, smartAccount } = useSmartAccountContext();
+  const { setSmartAccount } = useSmartAccountContext();
   const { setMainLoading } = useLoadingContext();
-  const { address } = useAccount();
 
   const createSmartAccount = async () => {
     const toastId = toast.loading("Creating Smart Account...");
 
     try {
       const ethersSigner = ethersProvider.getSigner();
-      const module = await ECDSAOwnershipValidationModule.create({
+      const modulee = await ECDSAOwnershipValidationModule.create({
         signer: ethersSigner,
         moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
       });
@@ -44,8 +43,8 @@ export const Navbar: React.FC = () => {
         bundler: bundler,
         paymaster: paymaster,
         entryPointAddress: DEFAULT_ENTRYPOINT_ADDRESS,
-        defaultValidationModule: module,
-        activeValidationModule: module,
+        defaultValidationModule: modulee,
+        activeValidationModule: modulee,
       });
       const smartAccountAddress = await biconomySmartAccount.getAccountAddress();
       setSmartAccount(biconomySmartAccount);
@@ -85,42 +84,40 @@ export const Navbar: React.FC = () => {
           Space<span style={{ color: "#FF6F03" }}>_</span>
         </Heading>
 
-        {address &&
-          smartAccount &&
-          pathname != "/" && (
-            <Flex alignItems={"center"} gap={"30px"}>
-              {links.map((link, index) => {
-                return (
-                  <Text
-                    key={index}
-                    fontSize={"1.05rem"}
-                    textTransform={"capitalize"}
-                    transition="color 0.2s ease"
-                    cursor={"pointer"}
-                    bg={
-                      pathname === `/${link}`
-                        ? "rgba(248, 122, 195, 0.3)"
-                        : "transparent"
-                    }
-                    p={"0.4em 0.6em"}
-                    borderRadius={"10px"}
-                    color={pathname === `/${link}` ? "black" : "blackAlpha.700"}
-                    _hover={{
-                      color: "blackAlpha.900",
-                      transition: "color 0.2s ease",
-                    }}
-                    fontWeight={pathname === `/${link}` ? 600 : 500}
-                    onClick={() => {
-                      setMainLoading(true);
-                      router.push(`/${link}`);
-                    }}
-                  >
-                    {link}
-                  </Text>
-                );
-              })}
-            </Flex>
-          )}
+        {pathname != "/" && (
+          <Flex alignItems={"center"} gap={"30px"}>
+            {links.map((link, index) => {
+              return (
+                <Text
+                  key={index}
+                  fontSize={"1.05rem"}
+                  textTransform={"capitalize"}
+                  transition="color 0.2s ease"
+                  cursor={"pointer"}
+                  bg={
+                    pathname === `/${link}`
+                      ? "rgba(248, 122, 195, 0.3)"
+                      : "transparent"
+                  }
+                  p={"0.4em 0.6em"}
+                  borderRadius={"10px"}
+                  color={pathname === `/${link}` ? "black" : "blackAlpha.700"}
+                  _hover={{
+                    color: "blackAlpha.900",
+                    transition: "color 0.2s ease",
+                  }}
+                  fontWeight={pathname === `/${link}` ? 600 : 500}
+                  onClick={() => {
+                    setMainLoading(true);
+                    router.push(`/${link}`);
+                  }}
+                >
+                  {link}
+                </Text>
+              );
+            })}
+          </Flex>
+        )}
 
         <Box>
           <ConnectButton label="Sign in" />

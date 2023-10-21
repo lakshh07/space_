@@ -52,6 +52,7 @@ export const CampaignsClient: React.FC = () => {
   const { address } = useAccount();
   const { setMainLoading } = useLoadingContext();
   const { campaignQuery } = useSubgraph();
+  const { accountAbstraction } = useAccountAbstraction();
 
   const [result, reexecuteQuery] = useQuery({
     query: campaignQuery,
@@ -91,7 +92,7 @@ export const CampaignsClient: React.FC = () => {
       campaignData.xp
     );
 
-    await useAccountAbstraction({
+    await accountAbstraction({
       setDisabled: setDisabled,
       setLoading: setLoading,
       transactionData: transaction,
@@ -106,6 +107,10 @@ export const CampaignsClient: React.FC = () => {
       amount: 0,
       xp: 0,
     });
+
+    setTimeout(() => {
+      reexecuteQuery({ requestPolicy: "network-only" });
+    }, 3000);
   };
 
   return (
@@ -140,6 +145,7 @@ export const CampaignsClient: React.FC = () => {
               status={list.status}
               metadata={list.metadata}
               isCampaign={true}
+              reexecuteQuery={reexecuteQuery}
             />
           );
         })

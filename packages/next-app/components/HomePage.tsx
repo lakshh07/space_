@@ -6,7 +6,6 @@ import React, { useEffect } from "react";
 import { Dela_Gothic_One } from "next/font/google";
 import { useRouter } from "next/navigation";
 import { useLoadingContext } from "@/context/loading";
-import { particle } from "@/utils/rainbowConfig";
 
 const delaGothicOne = Dela_Gothic_One({ weight: "400", subsets: ["latin"] });
 
@@ -16,7 +15,6 @@ export const HomePage: React.FC = () => {
 
   useEffect(() => {
     setMainLoading(false);
-    // particle.auth.o
   }, []);
 
   return (

@@ -33,7 +33,7 @@ const useSubgraph = () => {
 
   const campaignQueryById = gql`
     query($id: String) {
-      campaigns(id: $id) {
+      campaigns(where: { id: $id }) {
         id
         creator
         metadata
@@ -46,9 +46,31 @@ const useSubgraph = () => {
     }
   `;
 
-  const creatorQueryById = gql`
-    query($creator: String) {
-      creators(creator: $creator) {
+  const creatorQuery = gql`
+    query($address: String) {
+      quests(
+        where: {
+          creator: $address
+          assigned_not: "0x0000000000000000000000000000000000000000"
+        }
+      ) {
+        id
+        creator
+        metadata
+      }
+      donors(where: { donor: $address }) {
+        id
+        donor
+        amount
+      }
+      campaigns(where: { totalDonors_gte: 1 }) {
+        id
+        creator
+        metadata
+        totalDonors
+      }
+      creators(where: { creator: $address }) {
+        id
         creator
         isVerified
         metadata
@@ -60,8 +82,8 @@ const useSubgraph = () => {
   return {
     questQuery,
     campaignQuery,
+    creatorQuery,
     campaignQueryById,
-    creatorQueryById,
   };
 };
 

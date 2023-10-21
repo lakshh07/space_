@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { BiSolidRightArrow } from "react-icons/bi";
 import moment from "moment";
 import { useLoadingContext } from "@/context/loading";
+import { UseQueryExecute } from "urql";
 
 export type MetadataType = {
   title: string;
@@ -39,6 +40,7 @@ interface CardProps {
   status: boolean;
   metadata: string;
   isCampaign?: boolean;
+  reexecuteQuery: UseQueryExecute;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -51,6 +53,7 @@ export const Card: React.FC<CardProps> = ({
   status,
   metadata,
   isCampaign,
+  reexecuteQuery,
 }) => {
   const [data, setData] = useState<MetadataType>();
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -211,6 +214,7 @@ export const Card: React.FC<CardProps> = ({
           metadata={data}
           assignedUser={assignedUser}
           interestedUserArray={interestedUserArray}
+          reexecuteQuery={reexecuteQuery}
         />
       )}
     </Flex>

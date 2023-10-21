@@ -10,17 +10,18 @@ import {
   Box,
   Text,
   Button,
-  Heading,
   Center,
-  Flex,
   Spinner,
   Link,
 } from "@chakra-ui/react";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import QRCode from "react-qr-code";
 import { io } from "socket.io-client";
+import useAccountAbstraction, { contract } from "@/hooks/useAccountAbstraction";
+import { useSmartAccountContext } from "@/context/userAccount";
 
 interface QRCodeModalProps {
+  address?: string;
   credentialType?: string;
   onVerificationResult?: boolean;
   isOpen: boolean;
@@ -28,29 +29,34 @@ interface QRCodeModalProps {
 }
 
 export const QRCodeModal: React.FC<QRCodeModalProps> = ({
-  credentialType = "KYCAgeCredential",
+  credentialType = "SpaceMembership",
+  address,
   onVerificationResult = false,
   isOpen,
   onClose,
 }) => {
   const [sessionId, setSessionId] = useState<string>("");
   const [qrCodeData, setQrCodeData] = useState<any>();
-  const [isHandlingVerification, setIsHandlingVerification] =
-    useState<boolean>(false);
-  const [verificationCheckComplete, setVerificationCheckComplete] =
-    useState<boolean>(false);
+  const [isHandlingVerification, setIsHandlingVerification] = useState<boolean>(
+    false
+  );
+  const [verificationCheckComplete, setVerificationCheckComplete] = useState<
+    boolean
+  >(false);
   const [verificationMessage, setVerfificationMessage] = useState<string>("");
   const [socketEvents, setSocketEvents] = useState<any[]>([]);
   const [verified, setVerified] = useState<boolean>(false);
   const [windoww, setWindoww] = useState<any>();
+
+  const { smartAccount } = useSmartAccountContext();
+  const { accountAbstraction } = useAccountAbstraction();
 
   const publicServerURL = process.env
     .NEXT_PUBLIC_VERIFICATION_SERVER_PUBLIC_URL as string;
   const localServerURL = process.env
     .NEXT_PUBLIC_VERIFICATION_SERVER_LOCAL_HOST_URL as string;
 
-  const issuerOrHowToLink =
-    "https://oceans404.notion.site/How-to-get-a-Verifiable-Credential-f3d34e7c98ec4147b6b2fae79066c4f6?pvs=4";
+  const issuerOrHowToLink = process.env.NEXT_PUBLIC_ISSUER_LINK as string;
 
   const serverUrl = windoww?.href.startsWith("https")
     ? publicServerURL
@@ -85,7 +91,9 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
     };
 
     if (sessionId) {
-      fetchQrCode().then(setQrCodeData).catch(console.error);
+      fetchQrCode()
+        .then(setQrCodeData)
+        .catch(console.error);
     }
   }, [sessionId]);
 
@@ -115,8 +123,19 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
   }, [socketEvents]);
 
   // callback, send verification result back to app
-  const reportVerificationResult = (result: boolean) => {
+  const reportVerificationResult = async (result: boolean) => {
     setVerified(result);
+
+    if (address) {
+      const transaction = await contract.populateTransaction.changeCreatorVerification(
+        address
+      );
+
+      await accountAbstraction({
+        transactionData: transaction,
+        smartAccount: smartAccount,
+      });
+    }
   };
 
   return (
@@ -142,10 +161,10 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
             {qrCodeData ? (
               <Box>
                 {isHandlingVerification && (
-                  <div>
-                    <p>Authenticating...</p>
+                  <Box>
+                    <Text>Authenticating...</Text>
                     <Spinner size={"xl"} colorScheme="purple" my={2} />
-                  </div>
+                  </Box>
                 )}
                 {verificationMessage}
                 {qrCodeData &&
@@ -165,14 +184,18 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
                     </Box>
                   )}
 
-                {qrCodeData && qrCodeData.body?.scope[0].query && (
-                  <p>Type: {qrCodeData?.body?.scope[0].query.type}</p>
+                {qrCodeData && qrCodeData.body?.scope[0]?.query && (
+                  <Text mt={"1em"}>
+                    Type: {qrCodeData?.body?.scope[0]?.query.type}
+                  </Text>
                 )}
 
-                {qrCodeData?.body.message && <p>{qrCodeData.body.message}</p>}
+                {qrCodeData?.body.message && (
+                  <Text>{qrCodeData.body.message}</Text>
+                )}
 
-                {qrCodeData.body.reason && (
-                  <p>Reason: {qrCodeData.body.reason}</p>
+                {qrCodeData?.body.reason && (
+                  <Text>Reason: {qrCodeData.body.reason}</Text>
                 )}
               </Box>
             ) : (

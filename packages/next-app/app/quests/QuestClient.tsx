@@ -42,11 +42,13 @@ export const QuestClient: React.FC = () => {
   const { address } = useAccount();
   const { setMainLoading } = useLoadingContext();
   const { questQuery } = useSubgraph();
+  const { accountAbstraction } = useAccountAbstraction();
 
   const [result, reexecuteQuery] = useQuery({
     query: questQuery,
   });
   const { data, fetching } = result;
+
   // reexecuteQuery({ requestPolicy: "network-only" })
   useEffect(() => {
     setMainLoading(false);
@@ -77,7 +79,7 @@ export const QuestClient: React.FC = () => {
       questData.xp
     );
 
-    await useAccountAbstraction({
+    await accountAbstraction({
       setDisabled: setDisabled,
       setLoading: setLoading,
       transactionData: transaction,
@@ -92,6 +94,10 @@ export const QuestClient: React.FC = () => {
       amount: 0,
       xp: 0,
     });
+
+    setTimeout(() => {
+      reexecuteQuery({ requestPolicy: "network-only" });
+    }, 3000);
   };
 
   return (
@@ -106,6 +112,7 @@ export const QuestClient: React.FC = () => {
         onSubmit={create}
         formData={questData}
         setFormData={setQuestData}
+        address={address}
       />
 
       {fetching ? (
@@ -124,6 +131,7 @@ export const QuestClient: React.FC = () => {
               interestedUser={list.interestedUsers}
               assignedUser={list.assigned}
               metadata={list.metadata}
+              reexecuteQuery={reexecuteQuery}
             />
           );
         })

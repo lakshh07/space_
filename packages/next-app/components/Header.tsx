@@ -2,10 +2,12 @@ import { Button, Flex, Heading, Text, useDisclosure } from "@chakra-ui/react";
 import React from "react";
 import { CreateModal, fieldDataType } from "./CreateModal";
 import { Range } from "react-date-range";
+import { checkSignIn } from "@/utils/checkSignIn";
 
 interface HeaderProps {
   title: string;
   length: number;
+  address?: string;
   actionLabel: string;
   formData: fieldDataType;
   setFormData: React.Dispatch<React.SetStateAction<fieldDataType>>;
@@ -29,6 +31,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSubmit,
   dateRange,
   onChangeDate,
+  address,
 }) => {
   const { isOpen, onClose, onOpen } = useDisclosure();
 
@@ -56,7 +59,11 @@ export const Header: React.FC<HeaderProps> = ({
         </Text>
       </Flex>
 
-      <Button borderRadius={"15px"} colorScheme={"purple"} onClick={onOpen}>
+      <Button
+        borderRadius={"15px"}
+        colorScheme={"purple"}
+        onClick={() => checkSignIn(address) && onOpen()}
+      >
         {actionLabel}
       </Button>
 
