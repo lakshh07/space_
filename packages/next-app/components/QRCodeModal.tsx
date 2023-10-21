@@ -58,9 +58,7 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
 
   const issuerOrHowToLink = process.env.NEXT_PUBLIC_ISSUER_LINK as string;
 
-  const serverUrl = windoww?.href.startsWith("https")
-    ? publicServerURL
-    : localServerURL;
+  const serverUrl = publicServerURL;
 
   const getQrCodeApi = (sessionId: string) =>
     serverUrl + `/api/get-auth-qr?sessionId=${sessionId}`;
