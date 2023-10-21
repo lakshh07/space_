@@ -5,7 +5,7 @@ A social platform seamlessly introduces Web2 users to Web3, without the complexi
 
 <br/>
 
-![image](https://i.ibb.co/DKN8HTZ/Screenshot-2023-10-22-at-1-23-06-AM.png)
+![space](https://bafybeiagirshvmuvabo3tbw7esqhwdhp22z3j5nh24rihube322uahulye.ipfs.w3s.link/space.png)
 
 
 ### 🔗 Links
