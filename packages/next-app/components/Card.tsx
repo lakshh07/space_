@@ -19,6 +19,9 @@ import { BiSolidRightArrow } from "react-icons/bi";
 import moment from "moment";
 import { useLoadingContext } from "@/context/loading";
 import { UseQueryExecute } from "urql";
+import spaceAbi from "@/contracts/ABI/Space.json";
+import { readContract } from "@wagmi/core";
+import { questDataType } from "@/app/quests/QuestClient";
 
 export type MetadataType = {
   title: string;
@@ -56,6 +59,7 @@ export const Card: React.FC<CardProps> = ({
   reexecuteQuery,
 }) => {
   const [data, setData] = useState<MetadataType>();
+  const [activeIndex, setActiveIndex] = useState(0);
   const { isOpen, onClose, onOpen } = useDisclosure();
   const router = useRouter();
   const { setMainLoading } = useLoadingContext();
@@ -75,6 +79,19 @@ export const Card: React.FC<CardProps> = ({
     },
     [searchParams]
   );
+
+  const getActiveIndex = async (id: string) => {
+    const data: any = await readContract({
+      address: "0x67A94C43b74562aa461e3cf0ED91CfF66427312D",
+      abi: spaceAbi,
+      functionName: "fetchQuests",
+    });
+
+    const questIndex = data?.findIndex((list: questDataType) => {
+      return list.id === id;
+    });
+    setActiveIndex(questIndex + 1);
+  };
 
   useEffect(() => {
     getMetadata();
@@ -97,13 +114,14 @@ export const Card: React.FC<CardProps> = ({
         transform: "scale(1.012)",
         transition: "transform 0.3s ",
       }}
-      onClick={() => {
+      onClick={async () => {
         if (isCampaign) {
           setMainLoading(true);
           router.push(
             `/campaigns/${id}?${createQueryString("index", index.toString())}`
           );
         } else {
+          id && (await getActiveIndex(id));
           onOpen();
         }
       }}
@@ -221,7 +239,7 @@ export const Card: React.FC<CardProps> = ({
         <QuestModal
           isOpen={isOpen}
           onClose={onClose}
-          id={index + 1}
+          index={activeIndex}
           creator={creator}
           status={status}
           metadata={data}

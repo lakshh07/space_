@@ -124,6 +124,7 @@ export const QuestClient: React.FC = () => {
           return (
             <Card
               key={index}
+              id={list.id.toString()}
               index={index}
               creator={list.creator}
               amount={list.amount}

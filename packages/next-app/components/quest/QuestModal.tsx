@@ -31,7 +31,7 @@ import { UseQueryExecute } from "urql";
 import { readContract } from "@wagmi/core";
 import spaceAbi from "@/contracts/ABI/Space.json";
 interface QuestModalProps {
-  id: number;
+  index: number;
   creator: string;
   status: boolean;
   assignedUser?: string;
@@ -43,7 +43,7 @@ interface QuestModalProps {
 }
 
 export const QuestModal: React.FC<QuestModalProps> = ({
-  id,
+  index,
   creator,
   status,
   metadata,
@@ -66,7 +66,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
       address: "0x67A94C43b74562aa461e3cf0ED91CfF66427312D",
       abi: spaceAbi,
       functionName: "fetchInterestedUserComment",
-      args: [id, address],
+      args: [index, address],
     });
     return data;
   };
@@ -77,7 +77,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
       const interestedUserArrayString = interestedUserArray?.toString();
 
       const transaction = await contract.populateTransaction.addQuestUser(
-        id,
+        index,
         interestedUserArrayString,
         address,
         comment
@@ -101,7 +101,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
   const approveInterestedUser = async (userAddress: string) => {
     if (address) {
       const transaction = await contract.populateTransaction.approveQuestInterestedUser(
-        id,
+        index,
         userAddress
       );
 
@@ -123,7 +123,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
     setLoading(true);
     setDisabled(true);
 
-    const transaction = await signerContract.questComplete(id, {
+    const transaction = await signerContract.questComplete(index, {
       value: questAmount,
     });
 
@@ -231,7 +231,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
                         return list.length;
                       })
                       .map(async (userAddress, index) => {
-                        const cmt: string = await getComments(userAddress);
+                        // const cmt: string = await getComments(userAddress);
                         return (
                           <Flex
                             mb={"1em"}
@@ -244,7 +244,7 @@ export const QuestModal: React.FC<QuestModalProps> = ({
                               <Text fontSize={"14px"} color={"blackAlpha.700"}>
                                 {userAddress}
                               </Text>
-                              <Text>{cmt}</Text>
+                              {/* <Text>{cmt}</Text> */}
                             </Box>
 
                             {assignedUser ===
