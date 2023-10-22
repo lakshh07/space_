@@ -29,7 +29,7 @@ import { ethers } from "ethers";
 import moment from "moment";
 import { useLoadingContext } from "@/context/loading";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { ethersProvider } from "@/utils/rainbowConfig";
 import { useQuery } from "urql";
 import useSubgraph from "@/hooks/useSubgraph";
@@ -70,8 +70,12 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
   const { setMainLoading } = useLoadingContext();
   const pathname = usePathname();
   const { address } = useAccount();
-
+  const searchParams = useSearchParams();
   const { campaignQueryById } = useSubgraph();
+
+  const index = searchParams.get("index");
+  const indexToNumber = index && parseInt(index);
+
   function onChange(e: any) {
     setFundAmount(() => e.target.value);
   }
@@ -101,31 +105,36 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
   }, [mData?.donatedAmount, mData]);
 
   const fundDonation = async () => {
-    const toastId = toast.loading("Transaction logging...");
-    setLoading(true);
-    setDisabled(true);
+    if (indexToNumber) {
+      const toastId = toast.loading("Transaction logging...");
+      setLoading(true);
+      setDisabled(true);
 
-    const transaction = await signerContract.donateToCampaign(1, {
-      value: ethers.utils.parseEther(fundAmount.toString()),
-    });
-
-    ethersProvider
-      .waitForTransaction(transaction?.hash)
-      .then((receipt) => {
-        console.log(receipt);
-        if (receipt.status == 1) {
-          setLoading(false);
-          setDisabled(false);
-          setFundAmount(0.0);
-          toast.success("Transaction Successfull", { id: toastId });
-          setTimeout(() => {
-            reexecuteQuery({ requestPolicy: "network-only" });
-          }, 3000);
+      const transaction = await signerContract.donateToCampaign(
+        indexToNumber + 1,
+        {
+          value: ethers.utils.parseEther(fundAmount.toString()),
         }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      );
+
+      ethersProvider
+        .waitForTransaction(transaction?.hash)
+        .then((receipt) => {
+          console.log(receipt);
+          if (receipt.status == 1) {
+            setLoading(false);
+            setDisabled(false);
+            setFundAmount(0.0);
+            toast.success("Transaction Successfull", { id: toastId });
+            setTimeout(() => {
+              reexecuteQuery({ requestPolicy: "network-only" });
+            }, 3000);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (
@@ -143,13 +152,15 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
               <Spinner />
             </Flex>
           ) : (
-            <Stack spacing={"3em"}>
-              <Box>
+            <Stack spacing={"3em"} w={"80%"}>
+              <Box mx={"auto"}>
                 <Heading
-                  fontSize={"3.7rem"}
-                  lineHeight={"2.5rem"}
+                  fontSize={"3.2rem"}
+                  lineHeight={"3.5rem"}
                   fontWeight={700}
                   mt={"1em"}
+                  mx={"auto"}
+                  textAlign={"center"}
                   textTransform={"capitalize"}
                   letterSpacing={"2px"}
                   className={gabarito.className}
@@ -157,17 +168,20 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
                   {mData?.title}
                 </Heading>
 
-                <Flex
-                  mt={"0.5em"}
-                  className={gabarito.className}
-                  color={"blackAlpha.700"}
-                  fontSize={"14px"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                >
-                  <Text>Created by: {mData?.creator}</Text>
-                  <Text>+🔥{mData?.xp}XP</Text>
-                </Flex>
+                <Center>
+                  <Flex
+                    mt={"0.5em"}
+                    className={gabarito.className}
+                    color={"blackAlpha.700"}
+                    fontSize={"14px"}
+                    justifyContent={"space-between"}
+                    alignItems={"center"}
+                    w={"100%"}
+                  >
+                    <Text>Created by: {mData?.creator}</Text>
+                    <Text>+🔥{mData?.xp}XP</Text>
+                  </Flex>
+                </Center>
               </Box>
 
               <Container
@@ -339,7 +353,7 @@ export const CampaignPageClient: React.FC<CampaignPageClientProps> = ({
                 </Flex>
 
                 <CopyToClipboard
-                  text={`${process.env.NEXT_PUBLIC_FRONTEND_URL}${pathname}`}
+                  text={`${process.env.NEXT_PUBLIC_FRONTEND_URL}${pathname}?${searchParams}`}
                   onCopy={() => {
                     toast.success("Link copied!");
                   }}

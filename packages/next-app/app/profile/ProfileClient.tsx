@@ -68,7 +68,6 @@ type UserDataInfo = {
 };
 
 export const ProfileClient: React.FC = () => {
-  const [verified, setVerified] = useState<boolean>(false);
   const [sAddress, setSAddress] = useState<string>("");
   const [userInfo, setUserInfo] = useState<UserInfo>();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -207,7 +206,7 @@ export const ProfileClient: React.FC = () => {
                       PolygonID
                     </Text>
 
-                    {!verified ? (
+                    {!data?.creators[0]?.isVerified ? (
                       <Button
                         ml={"0.5rem"}
                         bg={"#7263D6"}

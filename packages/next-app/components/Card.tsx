@@ -12,9 +12,9 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { QuestModal } from "./quest/QuestModal";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { BiSolidRightArrow } from "react-icons/bi";
 import moment from "moment";
 import { useLoadingContext } from "@/context/loading";
@@ -59,11 +59,22 @@ export const Card: React.FC<CardProps> = ({
   const { isOpen, onClose, onOpen } = useDisclosure();
   const router = useRouter();
   const { setMainLoading } = useLoadingContext();
+  const searchParams = useSearchParams();
 
   const getMetadata = async () => {
     const metaData = await fetchIpfsCid(metadata);
     setData(metaData);
   };
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams]
+  );
 
   useEffect(() => {
     getMetadata();
@@ -89,7 +100,9 @@ export const Card: React.FC<CardProps> = ({
       onClick={() => {
         if (isCampaign) {
           setMainLoading(true);
-          router.push(`/campaigns/${id}`);
+          router.push(
+            `/campaigns/${id}?${createQueryString("index", index.toString())}`
+          );
         } else {
           onOpen();
         }

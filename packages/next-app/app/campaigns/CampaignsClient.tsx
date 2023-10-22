@@ -127,6 +127,7 @@ export const CampaignsClient: React.FC = () => {
         setFormData={setCampaignData}
         dateRange={dateRange}
         onChangeDate={(value) => setDateRange(value)}
+        address={address}
       />
 
       {fetching ? (
